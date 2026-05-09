@@ -259,31 +259,8 @@
           </button>
 
           <section class="db-section">
-            <div class="db-section-title">业务概览</div>
-            <div class="db-card db-soft-card">
-              <div class="db-entry-meta">
-                ${badge(`我的群 ${groups.length}`, "green")}
-                ${badge("下级门店 28", "blue")}
-                ${badge("待同步 78", "amber")}
-                ${badge("直播群 6", "violet")}
-              </div>
-              <p class="db-entry-sub" style="margin-top:10px;">系统自动识别门店、直播、课程范围变化；低风险自动同步，高风险进入待处理。</p>
-            </div>
-          </section>
-
-          <section class="db-section">
             <div class="db-section-title">常用群</div>
             ${groups.slice(0, 4).map(groupEntry).join("")}
-          </section>
-
-          <section class="db-section">
-            <div class="db-section-title">业务闭环</div>
-            <div class="db-info-list">
-              ${infoRow("来源变化", "门店 / 直播 / 课程范围自动识别")}
-              ${infoRow("分级同步", "自动同步 + 人工确认")}
-              ${infoRow("群聊触达", "文字 / 照片 / 文件 / 语音")}
-              ${infoRow("结果回写", "同步记录、异常状态、操作日志")}
-            </div>
           </section>
         </main>
         <div class="db-alpha">A<br>B<br>C<br>D<br>F<br>H<br>K<br>M<br>N<br>S<br>Z<br>#</div>
