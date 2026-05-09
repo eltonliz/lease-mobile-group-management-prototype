@@ -13,25 +13,24 @@
       type: "门店群",
       source: "南山门店",
       tenant: "租户 A",
-      owner: "华南代理",
-      ownerRole: "代理",
+      owner: "王店长",
+      ownerRole: "店长",
       ownerStatus: "正常",
-      managers: "王店长、李店员",
+      managers: "李店员",
       managersList: [
-        { name: "王店长", role: "店长", store: "南山门店", status: "正常" },
         { name: "李店员", role: "店员", store: "南山门店", status: "正常" }
       ],
       customers: 221,
-      members: 224,
-      internal: 3,
+      members: 223,
+      internal: 2,
       excluded: 9,
       pending: 0,
       status: "已自动创建",
       tone: "green",
       filter: "store",
-      visible: ["agent", "staff", "manager"],
+      visible: ["staff", "manager"],
       letter: "N",
-      summary: "切换到南山门店身份后自动可见；白名单客户入群，黑名单客户不入群。",
+      summary: "切换到南山门店店员或店长身份后自动可见；白名单客户入群，黑名单客户不入群。",
       stage: "白名单客户群",
       created: "2026-05-08 10:00",
       abnormal: 0,
@@ -163,7 +162,7 @@
     { id: "c3", name: "赵立民", phone: "136****2910", store: "福田旗舰店", owner: "陈店长", type: "白名单客户", groupId: "g2", status: "正常", letter: "Z", joinedAt: "05-07 18:02" },
     { id: "c4", name: "李杰", phone: "C0003", store: "宝安 A 店", owner: "许店长", type: "白名单客户", groupId: "g3", status: "正常", letter: "L", joinedAt: "05-08 16:30" },
     { id: "c5", name: "钱韵澄", phone: "不可见", store: "南山门店", owner: "王店长", type: "黑名单", groupId: "g1", status: "不入群", letter: "Q" },
-    { id: "c6", name: "王店长", phone: "内部成员", store: "南山门店", owner: "华南代理", type: "群管", groupId: "g1", status: "可管理", letter: "W" }
+    { id: "c6", name: "李店员", phone: "内部成员", store: "南山门店", owner: "王店长", type: "群管", groupId: "g1", status: "可管理", letter: "L" }
   ];
 
   const friends = [
@@ -207,22 +206,485 @@
     messages: [
       { groupId: "g1", from: "王店长", role: "群管", text: "今天新进白名单客户已经在群里了，黑名单客户不会展示。", mine: false },
       { groupId: "g1", from: "我", role: "店员", text: "收到，我先在群里回复客户咨询。", mine: true },
-      { groupId: "g1", from: "华南代理", role: "群主", text: "南山门店有问题直接在这个群里沟通。", mine: false }
+      { groupId: "g1", from: "王店长", role: "群主", text: "南山门店有问题直接在这个群里沟通。", mine: false }
     ]
   };
+
+  const prdAnnotations = [
+    {
+      id: 1,
+      screens: ["messages"],
+      selector: "[data-route='home'].db-text-action",
+      title: "消息页通讯录入口",
+      md: `
+**显示样式：**消息模块右上角展示「通讯录」入口，入口与现有消息页共存，不新增独立底部 Tab，也不做独立移动端群管工作台。
+
+**交互与跳转：**
+- 点击「通讯录」进入通讯录列表页。
+- 消息页仍保留站内消息、客服消息、最近群聊。
+- 返回通讯录外层时应回到消息页。
+
+**业务定义：**
+- 本期通讯录是 APP 消息模块内的轻量入口，核心目标是根据当前登录用户身份展示对应门店群 / 代理门店群。
+- 通讯录不是新的群管理系统；后台配置、完整群成员管理、直播群、课程 / 录播群、主播端均不进入 V1.0。
+
+**接口与埋点：**
+- 进入消息页记录 view_message_page。
+- 点击通讯录记录 click_address_book。
+- 点击后读取当前身份、租户、可见群列表。
+
+> 设计补充：当前原型保留已有消息/群聊能力入口，用于评审 IM 跳转，不改变通讯录的主业务边界。
+`
+    },
+    {
+      id: 2,
+      screens: ["home", "groups"],
+      selector: ".db-subtitle",
+      title: "当前身份与跨租户隔离",
+      md: `
+**显示样式：**通讯录顶部必须展示「当前租户」和「当前身份」，示例：当前租户：租户 A｜当前身份：南山店员。
+
+**交互与排序：**
+- 通讯录页面只读取个人中心已切换身份，不在通讯录内重新设计复杂身份切换。
+- 用户在「我的」页切换身份后，再进入通讯录查看该身份下的数据。
+
+**业务定义：**
+- 当前身份 = 普通买家：默认不展示管理型门店群。
+- 当前身份 = 店员 / 店长：只展示当前门店群。
+- 当前身份 = 代理：展示该代理拓展 / 邀请 / 管理的门店群。
+- 管理型通讯录数据必须按照当前身份所属租户隔离，当前身份 tenant_id = A 时禁止展示租户 B 的门店群 / 代理门店群。
+- 好友、私聊、个人已加入群属于消息侧个人关系补充能力，不作为管理型门店群参与跨租户权限判断。
+
+**异常流程：**
+- 当前身份失效：提示「当前身份不可用，请前往个人中心切换身份」。
+- 接口返回跨租户数据：前端不展示，后端记录异常日志，可提示「数据异常，请稍后重试」。
+
+**接口字段：**
+- user_id、tenant_id、identity_type、store_id、agent_id、role_name、permission_scope。
+`
+    },
+    {
+      id: 3,
+      screens: ["home", "groups"],
+      selector: ".db-section-title",
+      matchText: ["我的门店群", "我管理的门店群", "管理型群聊"],
+      title: "通讯录列表与群卡片",
+      md: `
+**显示样式：**通讯录列表由顶部导航、当前身份、搜索框、群聊分组、群聊列表和空状态组成。
+
+**群聊分组：**
+- 普通买家：显示「管理型群聊」空状态，不展示管理群。
+- 店员 / 店长：显示「我的门店群」。
+- 代理：显示「我管理的门店群」。
+
+**群卡片字段：**
+- 群名称：门店群聊名称。
+- 群类型：门店群 / 代理群 / 普通群聊。
+- 来源门店：群对应门店。
+- 群主：代理 / 店长。
+- 群管：店长、店员。
+- 客户数：白名单客户数量。
+- 群状态：正常 / 异常 / 已自动创建。
+- 更新时间：最近成员变化时间。
+
+**搜索规则：**
+- 店员、店长只搜索当前门店群。
+- 代理只搜索代理名下门店群。
+- 普通买家不搜索管理群，仅搜索可见个人群聊或好友。
+- 支持字段：群名称、门店名称、群主名称、群管名称。
+
+**空状态：**
+- 普通买家：暂无可查看的通讯录，请切换为店员、店长或代理身份后查看相关群聊。
+- 店员 / 店长无群：当前门店暂无群聊，请联系管理员确认门店群是否已创建。
+- 代理无门店群：暂无可管理的门店群，当前代理身份下尚未绑定门店。
+`
+    },
+    {
+      id: 4,
+      screens: ["groupDetail"],
+      selector: ".db-section-title",
+      matchText: "群基础信息",
+      title: "群详情基础信息",
+      md: `
+**页面目标：**展示某个门店群的基础信息、群主、群管和白名单客户成员，帮助一线角色确认当前群是否符合身份和租户权限。
+
+**基础字段：**
+- 群名称：门店群聊名称。
+- 群类型：门店群。
+- 来源门店：当前群所属门店。
+- 当前身份：当前用户查看身份。
+- 所属租户：当前身份所属租户。
+- 创建方式：系统自动创建。
+- 创建时间：群生成时间。
+- 群状态：正常 / 异常 / 停用 / 待同步。
+
+**进入群聊按钮：**
+- 已有群聊能力：展示「进入群聊」或「发消息」。
+- 暂无聊天能力：隐藏按钮，只展示通讯录关系。
+- 用户无群聊权限：按钮置灰或隐藏。
+
+**异常提示：**
+- 群主停用、群管离职、客户状态异常、群成员待同步、跨租户数据异常时显示提示。
+- V1.0 可以只提示，不在 APP 内做复杂处理。
+`
+    },
+    {
+      id: 5,
+      screens: ["groupDetail"],
+      selector: ".db-section-title",
+      matchText: "白名单客户",
+      title: "群成员、白名单与黑名单",
+      md: `
+**成员概览：**
+- 群主：代理 / 店长。
+- 群管：店长、店员。
+- 客户人数：白名单客户数量。
+- 黑名单客户：不进入群，不在成员列表展示。
+- 异常成员：离职、停用、失效成员。
+
+**群主字段：**
+- 姓名 / 昵称。
+- 身份：代理 / 店长。
+- 所属门店：如适用。
+- 状态：正常 / 停用。
+
+**群管字段：**
+- 姓名 / 昵称。
+- 身份：店长 / 店员。
+- 所属门店：当前门店。
+- 状态：正常 / 离职 / 停用。
+
+**客户展示规则：**
+- 客户属于当前门店，且客户状态 = 白名单，才展示在客户列表。
+- 客户状态 = 黑名单 / 停用 / 删除 / 未确认，均不展示。
+- 如客户从白名单变为黑名单，后台同步后应从群成员中移除或隐藏。
+
+**手机号保护：**
+- 客户手机号默认不明文展示。
+- 建议展示 138****5678，或仅展示客户编号。
+- 完整手机号查看权限由后台控制。
+
+[green] 白名单客户：可展示并进入群。
+[red] 黑名单客户：不入群、不展示。
+`
+    },
+    {
+      id: 6,
+      screens: ["chat"],
+      selector: ".db-composer",
+      title: "IM 会话与附件能力",
+      md: `
+**需求来源：**PRD V1.0 原文将完整 IM 聊天列为本期不做，但后续评审明确要求「IM 还是按设计稿来，添加好友也有」。本模块作为设计补充纳入原型。
+
+**显示样式：**
+- 群聊页展示消息列表、输入框、语音按钮、加号工具区、发送按钮。
+- 工具区包含照片、文件、语音、相机、语音通话、视频通话。
+
+**交互规则：**
+- 点击「进入群聊」或「发消息」进入会话页。
+- 输入文字后点击发送，在当前会话追加消息。
+- 点击语音或附件工具，原型追加对应模拟消息，用于验证能力入口。
+- 语音 / 视频通话可通过群详情或好友详情唤起底部选择弹窗。
+
+**业务边界：**
+- 群聊权限仍由当前身份和群可见范围控制。
+- IM 是已有消息能力的承接入口，不改变通讯录的群关系展示职责。
+- 后端需根据 group_id、tenant_id、identity_type 校验会话访问权限。
+`
+    },
+    {
+      id: 7,
+      screens: ["home", "tasks", "addFriend", "friendApply", "friendReview", "friendDetail", "friendSettings"],
+      selector: "[data-route='tasks'], .db-title, #dbSearchInput",
+      matchText: ["新的朋友", "申请添加好友", "手机号 / 昵称", "好友详情"],
+      title: "好友、添加好友与新的朋友",
+      md: `
+**需求来源：**添加好友和新的朋友为设计稿补充能力，PRD 中遗漏，但用户已明确要求保留。
+
+**入口设计：**
+- 通讯录页列表展示「新的朋友」入口。
+- 右上角加号下拉包含「添加好友」「新的朋友」「创建群聊」。
+- 「创建群聊」当前只做预留提示，业务先聚焦通讯录与好友关系。
+
+**添加好友流程：**
+1. 进入添加好友页。
+2. 搜索框 placeholder 为「手机号 / 昵称」，支持输入手机号或昵称搜索。
+3. 用户存在时展示头像、昵称、地区、脱敏手机号和「添加」按钮。
+4. 用户不存在时展示空状态「该用户不存在」。
+5. 点击添加进入申请添加好友页，填写打招呼内容并发送。
+6. 发送后展示「已发送申请」提示。
+
+**新的朋友流程：**
+- 展示待通过、已添加、等待验证、已拒绝等状态。
+- 待通过申请可进入详情页，支持「通过好友申请」和「拒绝好友申请」。
+- 已添加用户进入好友详情，可发消息、语音 / 视频、进入朋友设置。
+
+**安全与权限：**
+- 手机号展示必须脱敏。
+- 添加好友不应绕过用户隐私和风控规则。
+- 拉黑、删除好友仅影响好友关系，不应影响门店群白名单规则。
+`
+    },
+    {
+      id: 8,
+      screens: ["profile"],
+      selector: ".db-info-list",
+      matchText: "普通客户",
+      title: "身份切换、权限与后续边界",
+      md: `
+**身份来源：**当前身份由个人中心切换决定。通讯录只读取当前身份，不负责复杂身份管理。
+
+**本期支持身份：**
+- 普通买家：支持基础状态，默认不展示管理群。
+- 店员：展示当前门店群。
+- 店长：展示当前门店群，可作为群主或群管。
+- 代理：展示其拓展 / 邀请 / 管理的门店群。
+
+**操作权限：**
+- 进入通讯录：普通买家、店员、店长、代理均可。
+- 查看门店群、群详情、群主、群管、客户列表：店员、店长、代理可。
+- 查看完整手机号：按后台权限控制，默认脱敏。
+- 管理群成员：按后台权限控制，V1.0 前端不做复杂成员管理。
+
+**V1.0 不做：**
+- 主播通讯录、直播场次群。
+- 课程 / 录播群。
+- 独立移动端群管工作台。
+- 后台配置页面。
+
+**后续规划：**
+- V1.1 可扩展主播 / 直播群。
+- V1.2 可扩展课程 / 录播群。
+- V1.3 可扩展完整群管理、群成员同步、群主转移、AI 群运营。
+`
+    }
+  ];
 
   const currentRole = () => roles.find(item => item.id === state.role) || roles[0];
   const groupById = id => groups.find(item => item.id === id) || groups[0];
   const customerById = id => customers.find(item => item.id === id) || customers[0];
   const friendById = id => friends.find(item => item.id === id) || friends[0];
   const addCandidateById = id => addCandidates.find(item => item.id === id) || addCandidates[0];
-  const visibleGroups = () => groups.filter(group => group.visible.includes(state.role));
+  const visibleGroups = () => {
+    const role = currentRole();
+    return groups.filter(group => group.visible.includes(role.id) && (group.tenant === role.tenant || group.filter === "joined"));
+  };
   const visibleManagementGroups = () => visibleGroups().filter(group => group.filter === "store" || group.filter === "managed");
   const visibleChatGroups = () => visibleGroups().filter(group => state.role !== "buyer" || group.filter === "joined");
   const visibleCustomers = () => customers.filter(customer => customer.type !== "黑名单" && visibleManagementGroups().some(group => group.id === customer.groupId));
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
   const toneFor = value => value.includes("待") ? "amber" : value.includes("黑名单") || value.includes("不入群") ? "red" : value.includes("群管") || value.includes("加入") ? "blue" : value.includes("已") || value.includes("正常") || value.includes("白名单") ? "green" : "gray";
   const initials = value => escapeHtml(String(value).slice(0, 2));
+  const annotationColor = value => ({ green: "#22c7a5", red: "#ff2c62", blue: "#37b4ff", amber: "#f59e0b", violet: "#7a5af8" }[value] || "#8f99a3");
+
+  function renderAnnotationInline(text) {
+    return escapeHtml(text)
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, "$1<em>$2</em>")
+      .replace(/\[(green|red|blue|amber|violet)\]\s*/g, (_, color) => `<span class="prd-anno-dot" style="background:${annotationColor(color)}"></span>`);
+  }
+
+  function renderAnnotationMarkdown(md) {
+    const lines = md.trim().split(/\n/);
+    let html = "";
+    let paragraph = [];
+    let listType = null;
+
+    const closeParagraph = () => {
+      if (!paragraph.length) return;
+      html += `<p>${renderAnnotationInline(paragraph.join(" "))}</p>`;
+      paragraph = [];
+    };
+    const closeList = () => {
+      if (!listType) return;
+      html += `</${listType}>`;
+      listType = null;
+    };
+    const openList = type => {
+      if (listType === type) return;
+      closeList();
+      listType = type;
+      html += `<${type}>`;
+    };
+
+    lines.forEach(rawLine => {
+      const line = rawLine.trimEnd();
+      const trimmed = line.trim();
+      if (!trimmed) {
+        closeParagraph();
+        closeList();
+        return;
+      }
+      if (trimmed.startsWith("### ")) {
+        closeParagraph();
+        closeList();
+        html += `<h4>${renderAnnotationInline(trimmed.slice(4))}</h4>`;
+        return;
+      }
+      if (trimmed.startsWith("## ")) {
+        closeParagraph();
+        closeList();
+        html += `<h3>${renderAnnotationInline(trimmed.slice(3))}</h3>`;
+        return;
+      }
+      if (trimmed.startsWith("> ")) {
+        closeParagraph();
+        closeList();
+        html += `<blockquote>${renderAnnotationInline(trimmed.slice(2))}</blockquote>`;
+        return;
+      }
+      if (/^- /.test(trimmed)) {
+        closeParagraph();
+        openList("ul");
+        html += `<li>${renderAnnotationInline(trimmed.slice(2))}</li>`;
+        return;
+      }
+      if (/^\d+\.\s/.test(trimmed)) {
+        closeParagraph();
+        openList("ol");
+        html += `<li>${renderAnnotationInline(trimmed.replace(/^\d+\.\s/, ""))}</li>`;
+        return;
+      }
+      closeList();
+      paragraph.push(trimmed);
+    });
+    closeParagraph();
+    closeList();
+    return html;
+  }
+
+  function annotationMatchesText(element, matchText) {
+    if (!matchText) return true;
+    const text = [
+      element.textContent || "",
+      element.getAttribute("placeholder") || "",
+      element.getAttribute("value") || "",
+      element.value || ""
+    ].join(" ");
+    const values = Array.isArray(matchText) ? matchText : [matchText];
+    return values.some(value => text.includes(value));
+  }
+
+  function targetIsVisible(element) {
+    const rect = element.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.right > 0;
+  }
+
+  function resolveAnnotationTarget(annotation) {
+    const selectors = annotation.selector.split(",").map(item => item.trim());
+    for (const selector of selectors) {
+      const candidates = Array.from(document.querySelectorAll(selector));
+      const target = candidates.find(element => annotationMatchesText(element, annotation.matchText) && targetIsVisible(element));
+      if (target) return target;
+    }
+    return null;
+  }
+
+  function shouldShowAnnotation(annotation) {
+    return annotation.screens.includes(state.screen);
+  }
+
+  function positionAnnotationBadge(badge, target) {
+    const rect = target.getBoundingClientRect();
+    badge.style.left = `${Math.round(window.scrollX + rect.right - 4)}px`;
+    badge.style.top = `${Math.round(window.scrollY + rect.top - 8)}px`;
+  }
+
+  function positionAnnotationTooltip(badge, tooltip) {
+    const rect = badge.getBoundingClientRect();
+    const width = tooltip.offsetWidth || 450;
+    const height = tooltip.offsetHeight || 320;
+    let left = window.scrollX + rect.left - width + rect.width;
+    let top = window.scrollY + rect.bottom + 8;
+    if (left < window.scrollX + 8) left = window.scrollX + rect.right + 8;
+    if (left + width > window.scrollX + window.innerWidth - 8) left = window.scrollX + window.innerWidth - width - 8;
+    if (top + height > window.scrollY + window.innerHeight - 8) top = window.scrollY + rect.top - height - 8;
+    if (top < window.scrollY + 8) top = window.scrollY + 8;
+    tooltip.style.left = `${Math.max(window.scrollX + 8, Math.round(left))}px`;
+    tooltip.style.top = `${Math.max(window.scrollY + 8, Math.round(top))}px`;
+  }
+
+  function makeAnnotationDraggable(tooltip) {
+    if (tooltip.dataset.dragReady) return;
+    tooltip.dataset.dragReady = "true";
+    let drag = null;
+    tooltip.addEventListener("mousedown", event => {
+      if (event.target.closest(".prd-anno-close")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const rect = tooltip.getBoundingClientRect();
+      drag = {
+        x: event.clientX,
+        y: event.clientY,
+        left: window.scrollX + rect.left,
+        top: window.scrollY + rect.top
+      };
+    });
+    document.addEventListener("mousemove", event => {
+      if (!drag) return;
+      event.preventDefault();
+      const nextLeft = drag.left + event.clientX - drag.x;
+      const nextTop = drag.top + event.clientY - drag.y;
+      tooltip.style.left = `${Math.max(window.scrollX + 8, Math.round(nextLeft))}px`;
+      tooltip.style.top = `${Math.max(window.scrollY + 8, Math.round(nextTop))}px`;
+    });
+    document.addEventListener("mouseup", () => {
+      drag = null;
+    });
+  }
+
+  function openAnnotationTooltip(annotation, badge) {
+    let tooltip = document.querySelector(`.prd-anno-tooltip[data-anno-id="${annotation.id}"]`);
+    if (!tooltip) {
+      tooltip = document.createElement("div");
+      tooltip.className = "prd-anno-tooltip";
+      tooltip.dataset.annoId = annotation.id;
+      tooltip.innerHTML = `
+        <div class="prd-anno-head">
+          <div class="prd-anno-title">
+            <span class="prd-anno-badge">${annotation.id}</span>
+            <span class="prd-anno-title-text">需求描述：${escapeHtml(annotation.title)}</span>
+          </div>
+          <button class="prd-anno-close" aria-label="关闭">X</button>
+        </div>
+        <div class="prd-anno-body">${renderAnnotationMarkdown(annotation.md)}</div>
+      `;
+      tooltip.addEventListener("click", event => event.stopPropagation());
+      tooltip.addEventListener("mousedown", event => event.stopPropagation());
+      tooltip.querySelector(".prd-anno-close").addEventListener("click", event => {
+        event.stopPropagation();
+        tooltip.remove();
+      });
+      document.body.appendChild(tooltip);
+      makeAnnotationDraggable(tooltip);
+    }
+    positionAnnotationTooltip(badge, tooltip);
+  }
+
+  function renderAnnotations() {
+    document.querySelectorAll(".prd-anno-badge[data-anno-anchor='true']").forEach(item => item.remove());
+    prdAnnotations.filter(shouldShowAnnotation).forEach(annotation => {
+      const target = resolveAnnotationTarget(annotation);
+      if (!target) return;
+      const badge = document.createElement("span");
+      badge.className = "prd-anno-badge";
+      badge.dataset.annoAnchor = "true";
+      badge.dataset.annoId = annotation.id;
+      badge.textContent = annotation.id;
+      badge.addEventListener("mouseenter", event => {
+        event.stopPropagation();
+        openAnnotationTooltip(annotation, badge);
+      });
+      badge.addEventListener("click", event => {
+        event.stopPropagation();
+        openAnnotationTooltip(annotation, badge);
+      });
+      document.body.appendChild(badge);
+      positionAnnotationBadge(badge, target);
+      const tooltip = document.querySelector(`.prd-anno-tooltip[data-anno-id="${annotation.id}"]`);
+      if (tooltip) positionAnnotationTooltip(badge, tooltip);
+    });
+  }
 
   function statusBar() {
     return `
@@ -465,7 +927,7 @@
             <p class="db-entry-sub">${escapeHtml(group.type)}｜来源：${escapeHtml(group.source)}<br>群主：${escapeHtml(group.owner)}｜群管：${escapeHtml(group.managers)}</p>
             <span class="db-entry-meta">
               ${group.customers ? badge(`白名单 ${group.customers}`, "green") : badge("无客户成员", "gray")}
-              ${badge(`群管 ${group.internal}`, "blue")}
+              ${badge(`群管 ${group.managersList.length}`, "blue")}
               ${group.excluded ? badge(`黑名单排除 ${group.excluded}`, "red") : ""}
               ${badge(group.status, group.tone)}
             </span>
@@ -611,7 +1073,7 @@
             <div class="db-section-title">成员概览</div>
             <div class="db-info-list">
               ${infoRow("群主", `${group.owner}｜${group.ownerRole}`)}
-              ${infoRow("群管", `${group.internal} 人`)}
+              ${infoRow("群管", `${group.managersList.length} 人`)}
               ${infoRow("白名单客户", `${group.customers} 人`)}
               ${infoRow("黑名单客户", `已排除 ${group.excluded} 人`)}
               ${infoRow("异常成员", group.abnormal ? `${group.abnormal} 人，请联系管理员处理` : "无")}
@@ -1102,7 +1564,12 @@
       profile: profileScreen
     }[state.screen] || homeScreen;
     document.body.className = "design-business-body";
-    document.body.innerHTML = `<div class="db-phone">${screen()}</div>`;
+    let root = document.querySelector(".db-app-root");
+    if (!root) {
+      document.body.innerHTML = `<div class="db-app-root"></div>`;
+      root = document.querySelector(".db-app-root");
+    }
+    root.innerHTML = `<div class="db-phone">${screen()}</div>`;
     const searchInput = document.getElementById("dbSearchInput");
     if (searchInput) {
       searchInput.focus();
@@ -1110,6 +1577,7 @@
     }
     const chatInput = document.getElementById("dbChatInput");
     if (chatInput) chatInput.focus();
+    renderAnnotations();
   }
 
   function snapshot() {
@@ -1289,6 +1757,9 @@
       state.applyText = event.target.value;
     }
   });
+
+  window.addEventListener("resize", renderAnnotations);
+  document.addEventListener("scroll", renderAnnotations, true);
 
   render();
 })();
