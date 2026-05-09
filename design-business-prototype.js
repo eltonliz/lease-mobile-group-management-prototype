@@ -1,9 +1,9 @@
 (() => {
   const roles = [
-    { id: "buyer", name: "普通客户", scope: "个人身份", desc: "只查看自己的消息和已加入群聊，不参与门店群维护" },
-    { id: "staff", name: "南山店员", scope: "南山门店", desc: "切换到店员身份后，可查看本门店自动创建的客户群" },
-    { id: "manager", name: "南山店长", scope: "南山门店", desc: "作为门店群群管，维护本店白名单客户与群内沟通" },
-    { id: "agent", name: "华南代理", scope: "A / B / C 门店", desc: "代理邀请的门店会自动生成门店客户群，代理为群主" }
+    { id: "buyer", name: "普通客户", scope: "个人身份", tenant: "租户 C", desc: "可使用好友、聊天能力，不展示管理型门店群" },
+    { id: "staff", name: "南山店员", scope: "南山门店", tenant: "租户 A", desc: "切换到店员身份后，可查看本门店自动创建的客户群" },
+    { id: "manager", name: "南山店长", scope: "南山门店", tenant: "租户 A", desc: "作为门店群群管，维护本店白名单客户与群内沟通" },
+    { id: "agent", name: "华南代理", scope: "A / B / C 门店", tenant: "租户 B", desc: "代理邀请的门店会自动生成门店客户群，代理为群主" }
   ];
 
   const groups = [
@@ -12,8 +12,15 @@
       name: "南山门店客户群",
       type: "门店群",
       source: "南山门店",
+      tenant: "租户 A",
       owner: "华南代理",
+      ownerRole: "代理",
+      ownerStatus: "正常",
       managers: "王店长、李店员",
+      managersList: [
+        { name: "王店长", role: "店长", store: "南山门店", status: "正常" },
+        { name: "李店员", role: "店员", store: "南山门店", status: "正常" }
+      ],
       customers: 221,
       members: 224,
       internal: 3,
@@ -26,6 +33,8 @@
       letter: "N",
       summary: "切换到南山门店身份后自动可见；白名单客户入群，黑名单客户不入群。",
       stage: "白名单客户群",
+      created: "2026-05-08 10:00",
+      abnormal: 0,
       latest: "今天 10:20"
     },
     {
@@ -33,8 +42,14 @@
       name: "福田旗舰店客户群",
       type: "门店群",
       source: "福田旗舰店",
+      tenant: "租户 B",
       owner: "华南代理",
+      ownerRole: "代理",
+      ownerStatus: "正常",
       managers: "陈店长",
+      managersList: [
+        { name: "陈店长", role: "店长", store: "福田旗舰店", status: "正常" }
+      ],
       customers: 501,
       members: 503,
       internal: 2,
@@ -47,6 +62,8 @@
       letter: "F",
       summary: "代理身份下自动生成的门店群；店长为群管，客户来自该门店白名单。",
       stage: "白名单客户群",
+      created: "2026-05-06 18:20",
+      abnormal: 1,
       latest: "昨天 18:02"
     },
     {
@@ -54,8 +71,15 @@
       name: "宝安 A 店客户群",
       type: "门店群",
       source: "宝安 A 店",
+      tenant: "租户 B",
       owner: "华南代理",
+      ownerRole: "代理",
+      ownerStatus: "正常",
       managers: "许店长",
+      managersList: [
+        { name: "许店长", role: "店长", store: "宝安 A 店", status: "正常" },
+        { name: "刘店员", role: "店员", store: "宝安 A 店", status: "正常" }
+      ],
       customers: 168,
       members: 171,
       internal: 3,
@@ -68,6 +92,8 @@
       letter: "B",
       summary: "代理拓展门店后生成客户群，群主为代理，店长和店员为群管。",
       stage: "白名单客户群",
+      created: "2026-05-07 16:30",
+      abnormal: 0,
       latest: "05-08 16:30"
     },
     {
@@ -75,8 +101,14 @@
       name: "我的租赁咨询群",
       type: "普通群聊",
       source: "客户主动加入",
+      tenant: "租户 C",
       owner: "系统客服",
+      ownerRole: "客服",
+      ownerStatus: "正常",
       managers: "客服助手",
+      managersList: [
+        { name: "客服助手", role: "客服", store: "平台", status: "正常" }
+      ],
       customers: 12,
       members: 13,
       internal: 1,
@@ -89,6 +121,8 @@
       letter: "W",
       summary: "普通客户身份下可查看自己已加入的群聊。",
       stage: "我加入的群",
+      created: "2026-05-09 09:00",
+      abnormal: 0,
       latest: "今天 09:45"
     },
     {
@@ -96,8 +130,15 @@
       name: "华南代理门店协同群",
       type: "代理群",
       source: "华南代理",
+      tenant: "租户 B",
       owner: "华南代理负责人",
+      ownerRole: "代理",
+      ownerStatus: "正常",
       managers: "下级门店店长",
+      managersList: [
+        { name: "王店长", role: "店长", store: "南山门店", status: "正常" },
+        { name: "陈店长", role: "店长", store: "福田旗舰店", status: "正常" }
+      ],
       customers: 0,
       members: 86,
       internal: 86,
@@ -110,33 +151,50 @@
       letter: "H",
       summary: "代理与门店的内部协同群，无客户成员。",
       stage: "内部协同",
+      created: "2026-05-07 20:12",
+      abnormal: 0,
       latest: "05-07 20:12"
     }
   ];
 
   const customers = [
-    { id: "c1", name: "陈世敏", phone: "登录后可见", store: "南山门店", owner: "王店长", type: "白名单客户", groupId: "g1", status: "已入群", letter: "C" },
-    { id: "c2", name: "程婷婷", phone: "登录后可见", store: "南山门店", owner: "李店员", type: "白名单客户", groupId: "g1", status: "已入群", letter: "C" },
-    { id: "c3", name: "赵立民", phone: "登录后可见", store: "福田旗舰店", owner: "陈店长", type: "白名单客户", groupId: "g2", status: "已入群", letter: "Z" },
-    { id: "c4", name: "李杰", phone: "登录后可见", store: "宝安 A 店", owner: "许店长", type: "白名单客户", groupId: "g3", status: "已入群", letter: "L" },
+    { id: "c1", name: "陈世敏", phone: "138****8577", store: "南山门店", owner: "王店长", type: "白名单客户", groupId: "g1", status: "正常", letter: "C", joinedAt: "05-08 10:12" },
+    { id: "c2", name: "程婷婷", phone: "139****1121", store: "南山门店", owner: "李店员", type: "白名单客户", groupId: "g1", status: "正常", letter: "C", joinedAt: "05-08 11:08" },
+    { id: "c3", name: "赵立民", phone: "136****2910", store: "福田旗舰店", owner: "陈店长", type: "白名单客户", groupId: "g2", status: "正常", letter: "Z", joinedAt: "05-07 18:02" },
+    { id: "c4", name: "李杰", phone: "C0003", store: "宝安 A 店", owner: "许店长", type: "白名单客户", groupId: "g3", status: "正常", letter: "L", joinedAt: "05-08 16:30" },
     { id: "c5", name: "钱韵澄", phone: "不可见", store: "南山门店", owner: "王店长", type: "黑名单", groupId: "g1", status: "不入群", letter: "Q" },
     { id: "c6", name: "王店长", phone: "内部成员", store: "南山门店", owner: "华南代理", type: "群管", groupId: "g1", status: "可管理", letter: "W" }
   ];
 
+  const friends = [
+    { id: "f1", name: "徐世敏", phone: "130****8577", area: "广东省广州市天河区", remark: "", status: "好友", groupId: "g4", letter: "X" },
+    { id: "f2", name: "许昌", phone: "136****0918", area: "广东省深圳市南山区", remark: "摄影群客户", status: "好友", groupId: "g4", letter: "X" },
+    { id: "f3", name: "张敏", phone: "137****4501", area: "广东省深圳市宝安区", remark: "", status: "待通过", groupId: "g4", letter: "Z" }
+  ];
+
+  const addCandidates = [
+    { id: "a1", name: "小世敏", phone: "13033258577", masked: "130 3325 8577", area: "广东省广州市天河区", avatar: "小世", exists: true },
+    { id: "a2", name: "急先锋", phone: "13600008888", masked: "136 0000 8888", area: "广东省广州市天河区", avatar: "急先", exists: true }
+  ];
+
   const tasks = [
-    { id: "t1", customerId: "c1", title: "徐世敏", desc: "好久不见，加个微信，有空聚聚呀", status: "待确认", tone: "amber" },
-    { id: "t2", customerId: "c6", title: "王店长", desc: "南山门店群管身份已生效", status: "已添加", tone: "green" },
-    { id: "t3", customerId: "c5", title: "钱韵澄", desc: "该客户在黑名单内，不进入门店客户群", status: "不入群", tone: "red" }
+    { id: "r1", friendId: "f1", title: "徐世敏", desc: "好久不见，加个微信，有空聚聚呀", status: "待通过", tone: "amber" },
+    { id: "r2", friendId: "f2", title: "许昌", desc: "你好呀！通过一下呗", status: "已添加", tone: "green" },
+    { id: "r3", friendId: "f3", title: "张敏", desc: "我是张敏，想和你交流设备租赁", status: "等待验证", tone: "blue" }
   ];
 
   const state = {
-    screen: "home",
+    screen: "messages",
     role: "staff",
     filter: "all",
     customerFilter: "all",
     query: "",
     groupId: "g1",
     customerId: "c1",
+    friendId: "f1",
+    addCandidateId: "a1",
+    requestId: "r1",
+    applyText: "",
     history: [],
     plus: false,
     sheet: null,
@@ -156,8 +214,12 @@
   const currentRole = () => roles.find(item => item.id === state.role) || roles[0];
   const groupById = id => groups.find(item => item.id === id) || groups[0];
   const customerById = id => customers.find(item => item.id === id) || customers[0];
+  const friendById = id => friends.find(item => item.id === id) || friends[0];
+  const addCandidateById = id => addCandidates.find(item => item.id === id) || addCandidates[0];
   const visibleGroups = () => groups.filter(group => group.visible.includes(state.role));
-  const visibleCustomers = () => customers.filter(customer => visibleGroups().some(group => group.id === customer.groupId));
+  const visibleManagementGroups = () => visibleGroups().filter(group => group.filter === "store" || group.filter === "managed");
+  const visibleChatGroups = () => visibleGroups().filter(group => state.role !== "buyer" || group.filter === "joined");
+  const visibleCustomers = () => customers.filter(customer => customer.type !== "黑名单" && visibleManagementGroups().some(group => group.id === customer.groupId));
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
   const toneFor = value => value.includes("待") ? "amber" : value.includes("黑名单") || value.includes("不入群") ? "red" : value.includes("群管") || value.includes("加入") ? "blue" : value.includes("已") || value.includes("正常") || value.includes("白名单") ? "green" : "gray";
   const initials = value => escapeHtml(String(value).slice(0, 2));
@@ -207,18 +269,29 @@
 
   function mainHead(active = "home") {
     const role = currentRole();
+    if (active === "messages") {
+      return `
+        <div class="db-head">
+          <div class="db-title-row">
+            <h1 class="db-title">消息</h1>
+            <button class="db-icon-btn db-right db-text-action" data-route="home">通讯录</button>
+          </div>
+          <button class="db-search db-search-as-button" data-action="navToast">
+            <span>⌕</span><span style="color:#b5bdc5;font-size:13px;">搜索站内消息 / 群聊</span>
+          </button>
+        </div>
+      `;
+    }
     return `
       <div class="db-head">
         <div class="db-title-row">
-          <div class="db-top-tabs">
-            <button class="db-top-tab ${active === "messages" ? "active" : ""}" data-route="messages">消息</button>
-            <button class="db-top-tab ${active === "home" ? "active" : ""}" data-route="home">通讯录</button>
-          </div>
+          <button class="db-back" data-route="messages">‹</button>
+          <h1 class="db-title">通讯录</h1>
           <button class="db-icon-btn db-right" data-action="togglePlus"><span class="db-plus"></span></button>
         </div>
-        <div class="db-subtitle">${escapeHtml(role.name)}｜${escapeHtml(role.scope)}</div>
+        <div class="db-subtitle">当前租户：${escapeHtml(role.tenant)}｜当前身份：${escapeHtml(role.name)}</div>
         <button class="db-search db-search-as-button" data-action="openSearch">
-          <span>⌕</span><span style="color:#b5bdc5;font-size:13px;">搜索联系人 / 群聊 / 门店</span>
+          <span>⌕</span><span style="color:#b5bdc5;font-size:13px;">搜索群聊 / 门店 / 好友</span>
         </button>
       </div>
     `;
@@ -246,16 +319,17 @@
     if (!state.plus) return "";
     return `
       <div class="db-pop">
-        <button data-action="openSearch">添加客户</button>
+        <button data-route="addFriend">添加好友</button>
         <button data-route="tasks">新的朋友</button>
-        <button data-action="roleSheet">切换身份</button>
+        <button data-action="navToast">创建群聊</button>
       </div>
     `;
   }
 
   function homeScreen() {
-    const groupsForRole = visibleGroups();
-    const pendingTasks = tasks.filter(task => task.status === "待确认").length;
+    const managementGroups = visibleManagementGroups();
+    const chatGroups = visibleChatGroups();
+    const pendingTasks = tasks.filter(task => task.status === "待通过").length;
     return `
       <div class="db-page">
         ${statusBar()}
@@ -265,7 +339,7 @@
             ${avatar("朋友", "green")}
             <span class="db-entry-main">
               <p class="db-entry-title">新的朋友</p>
-              <p class="db-entry-sub">好友申请、客户申请、群管身份提醒</p>
+              <p class="db-entry-sub">好友申请、客户申请</p>
             </span>
             <span class="db-count">${pendingTasks}</span>
           </button>
@@ -273,14 +347,26 @@
             ${avatar("群聊", "blue")}
             <span class="db-entry-main">
               <p class="db-entry-title">我的群聊</p>
-              <p class="db-entry-sub">按当前身份展示自动创建或已加入的群</p>
+              <p class="db-entry-sub">好友群聊、门店群、代理门店群</p>
             </span>
           </button>
 
           <section class="db-section">
-            <div class="db-section-title">常用群</div>
-            ${groupsForRole.slice(0, 4).map(groupEntry).join("")}
+            <div class="db-section-title">我的好友</div>
+            ${friends.slice(0, 3).map(friendEntry).join("")}
           </section>
+
+          <section class="db-section">
+            <div class="db-section-title">${state.role === "agent" ? "我管理的门店群" : state.role === "buyer" ? "管理型群聊" : "我的门店群"}</div>
+            ${managementGroups.length ? managementGroups.slice(0, 4).map(groupEntry).join("") : emptyState("暂无可查看的通讯录<br>请切换为店员、店长或代理身份后查看相关群聊", true)}
+          </section>
+
+          ${chatGroups.some(group => group.filter === "joined") ? `
+            <section class="db-section">
+              <div class="db-section-title">我加入的群聊</div>
+              ${chatGroups.filter(group => group.filter === "joined").map(groupEntry).join("")}
+            </section>
+          ` : ""}
         </main>
         <div class="db-alpha">A<br>B<br>C<br>D<br>F<br>H<br>K<br>M<br>N<br>S<br>Z<br>#</div>
         ${bottomNav("home")}
@@ -291,7 +377,7 @@
   }
 
   function messagesScreen() {
-    const latestGroups = visibleGroups().slice(0, 3);
+    const latestGroups = visibleChatGroups().slice(0, 3);
     return `
       <div class="db-page">
         ${statusBar()}
@@ -349,7 +435,7 @@
 
   function groupsScreen() {
     const tabs = [["all", "全部"], ["store", "门店群"], ["managed", "我管理"], ["joined", "我加入"]];
-    const list = visibleGroups().filter(group => state.filter === "all" || group.filter === state.filter || (state.filter === "managed" && ["store", "managed"].includes(group.filter)));
+    const list = visibleChatGroups().filter(group => state.filter === "all" || group.filter === state.filter || (state.filter === "managed" && ["store", "managed"].includes(group.filter)));
     return `
       <div class="db-page db-soft">
         ${statusBar()}
@@ -396,7 +482,7 @@
   }
 
   function customersScreen() {
-    const tabs = [["all", "全部"], ["白名单客户", "白名单"], ["群管", "群管"], ["黑名单", "黑名单"]];
+    const tabs = [["all", "全部"], ["白名单客户", "白名单"], ["群管", "群管"]];
     const list = visibleCustomers().filter(item => state.customerFilter === "all" || item.type === state.customerFilter);
     return `
       <div class="db-page">
@@ -440,12 +526,26 @@
     `;
   }
 
+  function friendEntry(friend) {
+    return `
+      <button class="db-entry" data-action="openFriend" data-friend="${friend.id}">
+        ${avatar(friend.name, friend.status === "待通过" ? "amber" : "blue")}
+        <span class="db-entry-main">
+          <p class="db-entry-title">${escapeHtml(friend.name)}</p>
+          <p class="db-entry-sub">${escapeHtml(friend.area)}｜${friend.remark ? `备注：${escapeHtml(friend.remark)}` : "暂无备注"}</p>
+          <span class="db-entry-meta">${badge(friend.status, friend.status === "好友" ? "green" : "amber")}</span>
+        </span>
+      </button>
+    `;
+  }
+
   function searchScreen() {
     const q = state.query.trim();
     const hasQuery = q.length > 0;
-    const groupResults = hasQuery ? visibleGroups().filter(item => [item.name, item.type, item.source, item.owner].join("").includes(q)) : [];
+    const groupResults = hasQuery ? visibleChatGroups().filter(item => [item.name, item.type, item.source, item.owner, item.managers].join("").includes(q)) : [];
     const customerResults = hasQuery ? visibleCustomers().filter(item => [item.name, item.store, item.type].join("").includes(q)) : [];
-    const empty = hasQuery && !groupResults.length && !customerResults.length;
+    const friendResults = hasQuery ? friends.filter(item => [item.name, item.phone, item.area, item.remark].join("").includes(q)) : [];
+    const empty = hasQuery && !groupResults.length && !customerResults.length && !friendResults.length;
     return `
       <div class="db-page">
         ${statusBar()}
@@ -461,7 +561,8 @@
         </div>
         <main class="db-scroll no-nav">
           ${!hasQuery ? "" : empty ? emptyState("未搜索到联系人或群聊") : `
-            ${customerResults.length ? `<section class="db-section"><div class="db-section-title">联系人</div>${customerResults.slice(0, 3).map(customerEntry).join("")}</section>` : ""}
+            ${friendResults.length ? `<section class="db-section"><div class="db-section-title">好友</div>${friendResults.slice(0, 3).map(friendEntry).join("")}</section>` : ""}
+            ${customerResults.length ? `<section class="db-section"><div class="db-section-title">客户 / 群管</div>${customerResults.slice(0, 3).map(customerEntry).join("")}</section>` : ""}
             ${groupResults.length ? `<section class="db-section"><div class="db-section-title">群聊</div>${groupResults.slice(0, 4).map(groupEntry).join("")}</section>` : ""}
           `}
         </main>
@@ -470,12 +571,14 @@
     `;
   }
 
-  function emptyState(text) {
-    return `<div class="db-empty"><div class="db-empty-illus"></div><div>${escapeHtml(text)}</div></div>`;
+  function emptyState(text, html = false) {
+    return `<div class="db-empty compact"><div class="db-empty-illus"></div><div>${html ? text : escapeHtml(text)}</div></div>`;
   }
 
   function groupDetailScreen() {
     const group = groupById(state.groupId);
+    const role = currentRole();
+    const whiteCustomers = customers.filter(customer => customer.groupId === group.id && customer.type === "白名单客户");
     return `
       <div class="db-page db-soft">
         ${statusBar()}
@@ -495,13 +598,43 @@
             </div>
           </section>
           <section class="db-section">
+            <div class="db-section-title">群基础信息</div>
             <div class="db-info-list">
-              ${infoRow("白名单客户", `${group.customers} 位`)}
-              ${infoRow("群管", group.managers)}
-              ${infoRow("黑名单排除", `${group.excluded} 位`)}
-              ${infoRow("创建规则", group.filter === "store" ? "切换门店/代理身份后自动创建" : "按当前身份可见")}
-              ${infoRow("最近消息", group.latest)}
-              ${infoRow("手机号展示", "客户登录或授权前不可见")}
+              ${infoRow("当前身份", `${role.name}｜${role.scope}`)}
+              ${infoRow("所属租户", group.tenant)}
+              ${infoRow("创建方式", group.filter === "store" ? "系统自动创建" : "按当前身份可见")}
+              ${infoRow("创建时间", group.created)}
+              ${infoRow("群状态", group.status)}
+            </div>
+          </section>
+          <section class="db-section">
+            <div class="db-section-title">成员概览</div>
+            <div class="db-info-list">
+              ${infoRow("群主", `${group.owner}｜${group.ownerRole}`)}
+              ${infoRow("群管", `${group.internal} 人`)}
+              ${infoRow("白名单客户", `${group.customers} 人`)}
+              ${infoRow("黑名单客户", `已排除 ${group.excluded} 人`)}
+              ${infoRow("异常成员", group.abnormal ? `${group.abnormal} 人，请联系管理员处理` : "无")}
+            </div>
+          </section>
+          <div class="db-alert">黑名单客户不入群，通讯录仅展示群主、群管与白名单客户。</div>
+          ${group.abnormal ? `<div class="db-alert">当前群存在 ${group.abnormal} 名异常成员，请联系管理员处理</div>` : ""}
+          <section class="db-section">
+            <div class="db-section-title">群主</div>
+            <div class="db-info-list">
+              ${memberLine(group.owner, `角色：群主｜身份：${group.ownerRole}`, group.ownerStatus)}
+            </div>
+          </section>
+          <section class="db-section">
+            <div class="db-section-title">群管</div>
+            <div class="db-info-list">
+              ${group.managersList.map(item => memberLine(item.name, `身份：${item.role}｜${item.store}`, item.status)).join("")}
+            </div>
+          </section>
+          <section class="db-section">
+            <div class="db-section-title">白名单客户</div>
+            <div class="db-info-list">
+              ${whiteCustomers.length ? whiteCustomers.map(customer => memberLine(customer.name, `${customer.phone}｜${customer.store}`, customer.status)).join("") : `<div class="db-info-row"><span>当前群暂无白名单客户</span><span></span></div>`}
             </div>
           </section>
           <section class="db-section">
@@ -514,6 +647,18 @@
         ${sheet()}
         ${toast()}
       </div>
+    `;
+  }
+
+  function memberLine(name, desc, status) {
+    return `
+      <button class="db-info-row" data-action="memberToast">
+        <span>
+          <strong>${escapeHtml(name)}</strong>
+          <small>${escapeHtml(desc)}</small>
+        </span>
+        <span>${escapeHtml(status)}</span>
+      </button>
     `;
   }
 
@@ -553,18 +698,167 @@
     `;
   }
 
+  function friendDetailScreen() {
+    const friend = friendById(state.friendId);
+    const group = groupById(friend.groupId);
+    return `
+      <div class="db-page db-soft">
+        ${statusBar()}
+        ${titleHead("好友详情", { back: true, more: "openFriendSettings" })}
+        <main class="db-scroll no-nav">
+          <section class="db-detail-hero">
+            <div class="db-detail-person">
+              ${avatar(friend.name, "blue")}
+              <div>
+                <h2 class="db-detail-name">${escapeHtml(friend.name)}</h2>
+                <p class="db-detail-text">地区：${escapeHtml(friend.area)}<br>手机号：${escapeHtml(friend.phone)}</p>
+              </div>
+            </div>
+            <div class="db-actions" style="padding:0 18px;">
+              <button class="db-secondary" data-action="openChat" data-group="${group.id}">发消息</button>
+              <button class="db-secondary" data-action="callSheet">语音/视频</button>
+            </div>
+          </section>
+          <section class="db-section">
+            <div class="db-info-list">
+              ${infoRow("好友状态", friend.status)}
+              ${infoRow("朋友备注", friend.remark || "无备注")}
+              ${infoRow("所在群聊", group.name)}
+            </div>
+          </section>
+        </main>
+        ${sheet()}
+        ${toast()}
+      </div>
+    `;
+  }
+
+  function friendSettingsScreen() {
+    const friend = friendById(state.friendId);
+    return `
+      <div class="db-page db-soft">
+        ${statusBar()}
+        ${titleHead("朋友设置", { back: true })}
+        <main class="db-scroll no-nav">
+          <div class="db-info-list">
+            <button class="db-info-row" data-action="friendRemarkSheet"><span>设置朋友名称</span><span>${escapeHtml(friend.remark || friend.name)} ›</span></button>
+            <button class="db-info-row" data-action="toggleMute"><span>拉黑好友</span><span>${state.muted ? "已开启" : "未开启"}</span></button>
+          </div>
+          <button class="db-danger" style="width:100%;margin-top:18px;" data-action="deleteFriend">删除好友</button>
+        </main>
+        ${sheet()}
+        ${toast()}
+      </div>
+    `;
+  }
+
+  function addFriendScreen() {
+    const q = state.query.trim();
+    const results = q ? addCandidates.filter(item => [item.name, item.phone, item.masked].join("").includes(q)) : [];
+    return `
+      <div class="db-page">
+        ${statusBar()}
+        <div class="db-head-plain">
+          <div class="db-title-row" style="justify-content:flex-start;gap:8px;">
+            <button class="db-back" data-action="back" style="position:static;">‹</button>
+            <label class="db-search" style="flex:1;margin-top:0;">
+              <span>⌕</span>
+              <input id="dbSearchInput" value="${escapeHtml(state.query)}" placeholder="手机号 / 昵称" autofocus>
+              ${state.query ? `<button class="db-icon-btn" data-action="clearSearch" style="width:24px;height:24px;background:#eef0f2;">×</button>` : ""}
+            </label>
+          </div>
+        </div>
+        <main class="db-scroll no-nav">
+          ${!q ? emptyState("请输入手机号或昵称搜索好友") : results.length ? `
+            <section class="db-section">
+              ${results.map(item => `
+                <div class="db-entry">
+                  ${avatar(item.avatar, "green")}
+                  <span class="db-entry-main">
+                    <p class="db-entry-title">${escapeHtml(item.name)}</p>
+                    <p class="db-entry-sub">${escapeHtml(item.area)}<br>${escapeHtml(item.masked)}</p>
+                  </span>
+                  <button class="db-mini-btn" data-action="applyFriend" data-candidate="${item.id}">添加</button>
+                </div>
+              `).join("")}
+            </section>
+          ` : emptyState("该用户不存在")}
+        </main>
+        ${toast()}
+      </div>
+    `;
+  }
+
+  function friendApplyScreen() {
+    const candidate = addCandidateById(state.addCandidateId);
+    return `
+      <div class="db-page db-soft">
+        ${statusBar()}
+        ${titleHead("申请添加好友", { back: true })}
+        <main class="db-scroll no-nav">
+          <section class="db-detail-hero">
+            <div class="db-detail-person">
+              ${avatar(candidate.avatar, "green")}
+              <div>
+                <h2 class="db-detail-name">${escapeHtml(candidate.name)}</h2>
+                <p class="db-detail-text">${escapeHtml(candidate.area)}<br>${escapeHtml(candidate.masked)}</p>
+              </div>
+            </div>
+          </section>
+          <section class="db-section">
+            <div class="db-section-title">打招呼内容</div>
+            <textarea id="dbApplyText" class="db-textarea" placeholder="请输入打招呼内容">${escapeHtml(state.applyText || "哈喽！久仰大名，冒昧加你，多指教啦～")}</textarea>
+            <button class="db-primary" style="width:100%;margin-top:14px;" data-action="sendFriendApply">发送</button>
+          </section>
+        </main>
+        ${toast()}
+      </div>
+    `;
+  }
+
+  function friendReviewScreen() {
+    const request = tasks.find(item => item.id === state.requestId) || tasks[0];
+    const friend = friendById(request.friendId);
+    return `
+      <div class="db-page db-soft">
+        ${statusBar()}
+        ${titleHead("申请添加好友", { back: true })}
+        <main class="db-scroll no-nav">
+          <section class="db-detail-hero">
+            <div class="db-detail-person">
+              ${avatar(friend.name, "green")}
+              <div>
+                <h2 class="db-detail-name">${escapeHtml(friend.name)}</h2>
+                <p class="db-detail-text">地区：${escapeHtml(friend.area)}<br>手机号：${escapeHtml(friend.phone)}</p>
+              </div>
+            </div>
+          </section>
+          <section class="db-section">
+            <div class="db-section-title">打招呼内容</div>
+            <div class="db-card">
+              <p class="db-entry-title" style="font-size:14px;">${escapeHtml(request.desc)}</p>
+            </div>
+            <button class="db-primary" style="width:100%;margin-top:14px;" data-action="approveFriend" data-request="${request.id}">通过好友申请</button>
+            <button class="db-danger" style="width:100%;margin-top:12px;" data-action="rejectFriend" data-request="${request.id}">拒绝好友申请</button>
+          </section>
+        </main>
+        ${toast()}
+      </div>
+    `;
+  }
+
   function tasksScreen() {
     const visible = tasks;
     return `
       <div class="db-page">
         ${statusBar()}
-        ${titleHead("新的朋友", { back: true, right: `<button class="db-icon-btn db-right" data-action="openSearch" style="color:#22c7a5;font-size:13px;font-weight:800;width:auto;">添加客户</button>` })}
+        ${titleHead("新的朋友", { back: true, right: `<button class="db-icon-btn db-right db-text-action" data-route="addFriend">添加好友</button>` })}
         <main class="db-scroll no-nav">
           ${visible.length ? visible.map(task => {
-            const customer = customerById(task.customerId);
+            const friend = friendById(task.friendId);
             return `
-              <button class="db-entry" data-action="openCustomer" data-customer="${customer.id}">
-                ${avatar(customer.name, task.tone)}
+              <button class="db-entry" data-action="${task.status === "待通过" ? "openFriendReview" : "openFriend"}" data-request="${task.id}" data-friend="${friend.id}">
+                ${avatar(friend.name, task.tone)}
                 <span class="db-entry-main">
                   <p class="db-entry-title">${escapeHtml(task.title)}</p>
                   <p class="db-entry-sub">${escapeHtml(task.desc)}</p>
@@ -796,6 +1090,11 @@
       search: searchScreen,
       groupDetail: groupDetailScreen,
       customerDetail: customerDetailScreen,
+      friendDetail: friendDetailScreen,
+      friendSettings: friendSettingsScreen,
+      addFriend: addFriendScreen,
+      friendApply: friendApplyScreen,
+      friendReview: friendReviewScreen,
       tasks: tasksScreen,
       sync: syncScreen,
       settings: settingsScreen,
@@ -819,6 +1118,9 @@
       query: state.query,
       groupId: state.groupId,
       customerId: state.customerId,
+      friendId: state.friendId,
+      addCandidateId: state.addCandidateId,
+      requestId: state.requestId,
       filter: state.filter,
       customerFilter: state.customerFilter
     };
@@ -829,6 +1131,9 @@
     state.query = entry.query || "";
     state.groupId = entry.groupId || state.groupId;
     state.customerId = entry.customerId || state.customerId;
+    state.friendId = entry.friendId || state.friendId;
+    state.addCandidateId = entry.addCandidateId || state.addCandidateId;
+    state.requestId = entry.requestId || state.requestId;
     state.filter = entry.filter || state.filter;
     state.customerFilter = entry.customerFilter || state.customerFilter;
     state.plus = false;
@@ -845,6 +1150,9 @@
     state.screen = screen;
     if (params.groupId) state.groupId = params.groupId;
     if (params.customerId) state.customerId = params.customerId;
+    if (params.friendId) state.friendId = params.friendId;
+    if (params.addCandidateId) state.addCandidateId = params.addCandidateId;
+    if (params.requestId) state.requestId = params.requestId;
     render();
   }
 
@@ -854,7 +1162,7 @@
       restore(entry);
       return;
     }
-    route("home", { reset: true, replace: true });
+    route("messages", { reset: true, replace: true });
   }
 
   function showToast(text) {
@@ -884,9 +1192,13 @@
     if (action === "customerFilter") { state.customerFilter = el.dataset.filter || "all"; render(); return; }
     if (action === "openGroup") { route("groupDetail", { groupId: el.dataset.group }); return; }
     if (action === "openCustomer") { route("customerDetail", { customerId: el.dataset.customer }); return; }
+    if (action === "openFriend") { route("friendDetail", { friendId: el.dataset.friend }); return; }
+    if (action === "openFriendReview") { route("friendReview", { requestId: el.dataset.request, friendId: el.dataset.friend }); return; }
+    if (action === "applyFriend") { route("friendApply", { addCandidateId: el.dataset.candidate }); return; }
     if (action === "openChat") { route("chat", { groupId: el.dataset.group || state.groupId }); return; }
     if (action === "openSync") { route("sync", { groupId: el.dataset.group || state.groupId }); return; }
     if (action === "openSettings") { route("settings", { groupId: el.dataset.group || state.groupId }); return; }
+    if (action === "openFriendSettings") { route("friendSettings", { friendId: state.friendId }); return; }
     if (action === "sourceToast") { showToast("群聊由身份、门店和白名单关系自动生成"); return; }
     if (action === "roleSheet") { state.plus = false; state.sheet = "role"; render(); return; }
     if (action === "setRole") {
@@ -899,6 +1211,7 @@
       return;
     }
     if (action === "navToast") { showToast("当前先聚焦消息侧通讯录"); return; }
+    if (action === "memberToast") { showToast("仅展示通讯录关系，成员管理由后台控制"); return; }
     if (action === "callSheet") { state.sheet = "call"; render(); return; }
     if (action === "remarkSheet") { state.sheet = "remark"; render(); return; }
     if (action === "disableSheet") { state.sheet = "disable"; render(); return; }
@@ -914,6 +1227,7 @@
       return;
     }
     if (action === "disableGroup") { state.sheet = null; showToast("群已停用，历史记录仍保留"); return; }
+    if (action === "deleteFriend") { showToast("已删除好友"); return; }
     if (action === "sheetToast") { state.sheet = null; showToast("正在发起通话"); return; }
     if (action === "confirmSync") {
       const group = groupById(el.dataset.group || state.groupId);
@@ -923,6 +1237,24 @@
     }
     if (action === "escalateSync") { showToast("已提交上级处理"); return; }
     if (action === "rejectSync") { showToast("已拒绝本次变更"); return; }
+    if (action === "sendFriendApply") {
+      const input = document.getElementById("dbApplyText");
+      state.applyText = (input?.value || state.applyText || "").trim();
+      showToast("已发送申请");
+      return;
+    }
+    if (action === "approveFriend") {
+      const request = tasks.find(item => item.id === el.dataset.request);
+      if (request) request.status = "已添加";
+      showToast("已通过好友申请");
+      return;
+    }
+    if (action === "rejectFriend") {
+      const request = tasks.find(item => item.id === el.dataset.request);
+      if (request) request.status = "已拒绝";
+      showToast("已拒绝好友申请");
+      return;
+    }
     if (action === "sendText") {
       const input = document.getElementById("dbChatInput");
       const text = (input?.value || state.chatInput || "").trim();
@@ -952,6 +1284,9 @@
     }
     if (event.target?.id === "dbChatInput") {
       state.chatInput = event.target.value;
+    }
+    if (event.target?.id === "dbApplyText") {
+      state.applyText = event.target.value;
     }
   });
 
