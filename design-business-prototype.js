@@ -109,21 +109,21 @@
   ];
 
   const tasks = [
-    { id: "t1", groupId: "g1", title: "南山门店客户群", desc: "新增客户 20 人，移除客户 3 人，新增店员 1 人", status: "待通过", tone: "green" },
-    { id: "t2", groupId: "g2", title: "五一租赁专场直播群", desc: "直播覆盖门店新增 2 家，客户需补充进群", status: "等待验证", tone: "green" },
+    { id: "t1", groupId: "g1", title: "南山门店客户群", desc: "新增客户 20 人，移除客户 3 人，新增店员 1 人", status: "待人工确认", tone: "amber" },
+    { id: "t2", groupId: "g2", title: "五一租赁专场直播群", desc: "直播覆盖门店新增 2 家，客户需补充进群", status: "分级同步", tone: "green" },
     { id: "t3", groupId: "g3", title: "福田旗舰店客户群", desc: "原群主账号停用，需要重新指定群主", status: "待处理", tone: "amber" },
     { id: "t4", groupId: "g4", title: "设备租赁使用课程群", desc: "黑名单客户已排除，低风险成员可自动同步", status: "已同步", tone: "gray" }
   ];
 
   const state = {
     screen: "home",
-    prev: "home",
     role: "agent",
     filter: "all",
     customerFilter: "all",
     query: "",
     groupId: "g2",
     customerId: "c1",
+    history: [],
     plus: false,
     sheet: null,
     toast: "",
@@ -131,6 +131,7 @@
     muted: false,
     synced: {},
     chatInput: "",
+    toolsOpen: true,
     messages: [
       { groupId: "g2", from: "主播小李", role: "群主", text: "今晚直播前，麻烦各门店把预约客户问题同步一下。", mine: false },
       { groupId: "g2", from: "我", role: "代理", text: "南山门店新增客户已完成去重，待同步名单我来确认。", mine: true },
@@ -142,7 +143,7 @@
   const groupById = id => groups.find(item => item.id === id) || groups[0];
   const customerById = id => customers.find(item => item.id === id) || customers[0];
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
-  const toneFor = value => value === "待人工确认" || value === "待处理" || value === "待通过" ? "amber" : value.includes("异常") || value.includes("黑名单") ? "red" : value.includes("直播") || value.includes("售中") ? "blue" : value.includes("课程") ? "violet" : value.includes("已") || value.includes("正常") || value.includes("售后") ? "green" : "gray";
+  const toneFor = value => value === "待人工确认" || value === "待处理" || value.includes("分级同步") ? "amber" : value.includes("异常") || value.includes("黑名单") ? "red" : value.includes("直播") || value.includes("售中") ? "blue" : value.includes("课程") ? "violet" : value.includes("已") || value.includes("正常") || value.includes("售后") ? "green" : "gray";
   const initials = value => escapeHtml(String(value).slice(0, 2));
 
   function statusBar() {
@@ -271,7 +272,7 @@
           </section>
 
           <section class="db-section">
-            <div class="db-section-title">M</div>
+            <div class="db-section-title">常用群</div>
             ${groups.slice(0, 4).map(groupEntry).join("")}
           </section>
 
@@ -371,7 +372,7 @@
         <div class="db-head">
           <div class="db-title-row">
             <h1 class="db-title">客户通讯录</h1>
-            <button class="db-icon-btn db-right" data-action="openSearch"><span class="db-plus"></span></button>
+            <button class="db-icon-btn db-right" data-action="togglePlus"><span class="db-plus"></span></button>
           </div>
           <button class="db-search db-search-as-button" data-action="openSearch">
             <span>⌕</span><span style="color:#b5bdc5;font-size:13px;">搜索客户 / 手机号 / 门店</span>
@@ -388,6 +389,7 @@
         </main>
         <div class="db-alpha">A<br>B<br>C<br>D<br>E<br>F<br>G<br>H<br>J<br>L<br>Q<br>S<br>Z<br>#</div>
         ${bottomNav("customers")}
+        ${plusMenu()}
         ${toast()}
       </div>
     `;
@@ -506,7 +508,7 @@
               ${avatar(customer.name, customer.type === "黑名单" ? "red" : "green")}
               <div>
                 <h2 class="db-detail-name">${escapeHtml(customer.name)}</h2>
-                <p class="db-detail-text">地区：${escapeHtml(customer.store)}<br>电话：${escapeHtml(customer.phone)}</p>
+              <p class="db-detail-text">所属门店：${escapeHtml(customer.store)}<br>电话：${escapeHtml(customer.phone)}</p>
               </div>
             </div>
             <div class="db-actions" style="padding:0 18px;">
@@ -587,9 +589,14 @@
           </section>
           ${done ? `<div class="db-toast" style="position:static;transform:none;margin:14px auto 0;">已发送同步申请</div>` : ""}
           <section class="db-section">
-            <button class="db-primary" style="width:100%;" data-action="confirmSync" data-group="${group.id}">确认同步</button>
-            <button class="db-secondary" style="width:100%;margin-top:12px;" data-action="escalateSync">提交上级处理</button>
-            <button class="db-danger" style="width:100%;margin-top:12px;" data-action="rejectSync">拒绝本次变更</button>
+            ${done ? `
+              <button class="db-primary" style="width:100%;" data-action="openGroup" data-group="${group.id}">返回群详情</button>
+              <button class="db-secondary" style="width:100%;margin-top:12px;" data-route="tasks">查看待处理</button>
+            ` : `
+              <button class="db-primary" style="width:100%;" data-action="confirmSync" data-group="${group.id}">确认同步</button>
+              <button class="db-secondary" style="width:100%;margin-top:12px;" data-action="escalateSync">提交上级处理</button>
+              <button class="db-danger" style="width:100%;margin-top:12px;" data-action="rejectSync">拒绝本次变更</button>
+            `}
           </section>
         </main>
         ${toast()}
@@ -620,22 +627,25 @@
   function chatScreen() {
     const group = groupById(state.groupId);
     const list = state.messages.filter(item => item.groupId === group.id);
+    const messages = list.length ? list : [{ groupId: group.id, from: "系统", role: "同步助手", text: `${group.name}暂无群消息，成员同步后可直接承接客户触达。`, mine: false, system: true }];
     return `
       <div class="db-page db-chat-body">
         ${statusBar()}
         ${titleHead(group.name, { back: true, more: "openSettings" })}
         <main class="db-scroll with-composer">
           <div class="db-chat-day">2026-05-09 09:41</div>
-          ${list.map(messageView).join("")}
+          ${group.filter === "live" ? `<div class="db-stage-bar">${badge("售前", "green")}${badge("售中", "blue")}${badge("售后", "violet")}</div>` : ""}
+          ${messages.map(messageView).join("")}
           <button class="db-material" data-action="toolMessage" data-type="素材库">素材库</button>
         </main>
         <div class="db-composer">
           <div class="db-input-row">
             <button class="db-round" data-action="voiceMessage">≋</button>
             <input id="dbChatInput" class="db-chat-input" value="${escapeHtml(state.chatInput)}" placeholder="请输入..." />
-            <button class="db-round" data-action="sendText">＋</button>
+            <button class="db-round" data-action="toggleTools">＋</button>
+            <button class="db-send" data-action="sendText">发送</button>
           </div>
-          <div class="db-tool-grid">
+          <div class="db-tool-grid ${state.toolsOpen ? "show" : ""}">
             ${toolButton("照片", "□")}
             ${toolButton("文件", "▤")}
             ${toolButton("语音", "≋")}
@@ -654,6 +664,9 @@
   }
 
   function messageView(message) {
+    if (message.system) {
+      return `<div class="db-system-msg">${escapeHtml(message.text)}</div>`;
+    }
     return `
       <div class="db-message ${message.mine ? "mine" : ""}">
         ${message.mine ? "" : avatar(message.from, "blue")}
@@ -780,20 +793,56 @@
     document.body.className = "design-business-body";
     document.body.innerHTML = `<div class="db-phone">${screen()}</div>`;
     const searchInput = document.getElementById("dbSearchInput");
-    if (searchInput) searchInput.focus();
+    if (searchInput) {
+      searchInput.focus();
+      searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+    }
     const chatInput = document.getElementById("dbChatInput");
     if (chatInput) chatInput.focus();
   }
 
+  function snapshot() {
+    return {
+      screen: state.screen,
+      query: state.query,
+      groupId: state.groupId,
+      customerId: state.customerId,
+      filter: state.filter,
+      customerFilter: state.customerFilter
+    };
+  }
+
+  function restore(entry) {
+    state.screen = entry.screen || "home";
+    state.query = entry.query || "";
+    state.groupId = entry.groupId || state.groupId;
+    state.customerId = entry.customerId || state.customerId;
+    state.filter = entry.filter || state.filter;
+    state.customerFilter = entry.customerFilter || state.customerFilter;
+    state.plus = false;
+    state.sheet = null;
+    render();
+  }
+
   function route(screen, params = {}) {
+    if (params.reset) state.history = [];
+    if (!params.replace && !params.reset && state.screen !== screen) state.history.push(snapshot());
     if (!["search"].includes(screen)) state.query = "";
     state.plus = false;
     state.sheet = null;
-    state.prev = params.prev || state.screen;
     state.screen = screen;
     if (params.groupId) state.groupId = params.groupId;
     if (params.customerId) state.customerId = params.customerId;
     render();
+  }
+
+  function goBack() {
+    const entry = state.history.pop();
+    if (entry) {
+      restore(entry);
+      return;
+    }
+    route("home", { reset: true, replace: true });
   }
 
   function showToast(text) {
@@ -811,21 +860,21 @@
     if (!el) return;
     const routeName = el.dataset.route;
     if (routeName) {
-      route(routeName);
+      route(routeName, { reset: ["home", "groups", "customers", "profile"].includes(routeName) });
       return;
     }
     const action = el.dataset.action;
     if (action === "togglePlus") { state.plus = !state.plus; render(); return; }
-    if (action === "openSearch") { route("search", { prev: state.screen }); return; }
+    if (action === "openSearch") { route("search"); return; }
     if (action === "clearSearch") { state.query = ""; render(); return; }
-    if (action === "back") { route(state.prev && state.prev !== state.screen ? state.prev : "home"); return; }
+    if (action === "back") { goBack(); return; }
     if (action === "filter") { state.filter = el.dataset.filter || "all"; render(); return; }
     if (action === "customerFilter") { state.customerFilter = el.dataset.filter || "all"; render(); return; }
-    if (action === "openGroup") { route("groupDetail", { groupId: el.dataset.group, prev: state.screen }); return; }
-    if (action === "openCustomer") { route("customerDetail", { customerId: el.dataset.customer, prev: state.screen }); return; }
-    if (action === "openChat") { route("chat", { groupId: el.dataset.group || state.groupId, prev: state.screen }); return; }
-    if (action === "openSync") { route("sync", { groupId: el.dataset.group || state.groupId, prev: state.screen }); return; }
-    if (action === "openSettings") { route("settings", { groupId: state.groupId, prev: state.screen }); return; }
+    if (action === "openGroup") { route("groupDetail", { groupId: el.dataset.group }); return; }
+    if (action === "openCustomer") { route("customerDetail", { customerId: el.dataset.customer }); return; }
+    if (action === "openChat") { route("chat", { groupId: el.dataset.group || state.groupId }); return; }
+    if (action === "openSync") { route("sync", { groupId: el.dataset.group || state.groupId }); return; }
+    if (action === "openSettings") { route("settings", { groupId: state.groupId }); return; }
     if (action === "sourceToast") { showToast("来源对象已在后台规则中自动识别"); return; }
     if (action === "roleSheet") { state.plus = false; state.sheet = "role"; render(); return; }
     if (action === "setRole") { state.role = el.dataset.role || state.role; state.sheet = null; showToast("身份已切换"); return; }
@@ -862,6 +911,7 @@
       render();
       return;
     }
+    if (action === "toggleTools") { state.toolsOpen = !state.toolsOpen; render(); return; }
     if (action === "voiceMessage") {
       state.messages.push({ groupId: state.groupId, from: "我", role: "代理", text: "语音消息 12 秒", mine: true });
       render();

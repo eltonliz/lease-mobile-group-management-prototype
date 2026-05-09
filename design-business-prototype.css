@@ -267,7 +267,7 @@ body.design-business-body {
 }
 
 .db-scroll.no-nav {
-  padding-bottom: 24px;
+  padding-bottom: 56px;
 }
 
 .db-scroll.with-composer {
@@ -752,6 +752,27 @@ body.design-business-body {
   color: #fff;
 }
 
+.db-system-msg {
+  width: fit-content;
+  max-width: 86%;
+  margin: 12px auto;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(31, 41, 51, .08);
+  color: #8f99a3;
+  font-size: 11px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.db-stage-bar {
+  margin: 8px 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
 .db-material {
   width: fit-content;
   margin: 18px 0 12px auto;
@@ -791,6 +812,18 @@ body.design-business-body {
   font-weight: 900;
 }
 
+.db-send {
+  width: 48px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: #22c7a5;
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .db-chat-input {
   flex: 1;
   height: 38px;
@@ -805,9 +838,13 @@ body.design-business-body {
 
 .db-tool-grid {
   margin-top: 16px;
-  display: grid;
+  display: none;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
+}
+
+.db-tool-grid.show {
+  display: grid;
 }
 
 .db-tool {
