@@ -4387,5 +4387,1572 @@
 
     render();
   </script>
+  <script>
+    (() => {
+      const style = document.createElement("style");
+      style.textContent = `
+        body.im-redesign-body {
+          margin: 0;
+          min-height: 100vh;
+          padding: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #eef1f5;
+          color: #1f2933;
+          font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        .im-phone {
+          width: min(100vw - 24px, 390px);
+          height: min(100vh - 36px, 844px);
+          min-height: 720px;
+          overflow: hidden;
+          position: relative;
+          background: #fff;
+          border-radius: 28px;
+          box-shadow: 0 20px 48px rgba(15, 23, 42, .18);
+          border: 1px solid rgba(17, 24, 39, .08);
+        }
+
+        .im-screen {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          background: #fff;
+          overflow: hidden;
+        }
+
+        .im-status {
+          height: 34px;
+          padding: 11px 22px 0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          flex: none;
+          color: #171923;
+          font-size: 12px;
+          font-weight: 800;
+          background: #fff;
+        }
+
+        .im-status-icons {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+
+        .im-signal {
+          width: 17px;
+          height: 10px;
+          display: inline-grid;
+          grid-template-columns: repeat(4, 3px);
+          align-items: end;
+          gap: 1px;
+        }
+
+        .im-signal i {
+          width: 3px;
+          background: #111827;
+          border-radius: 2px;
+        }
+
+        .im-signal i:nth-child(1) { height: 4px; }
+        .im-signal i:nth-child(2) { height: 6px; }
+        .im-signal i:nth-child(3) { height: 8px; }
+        .im-signal i:nth-child(4) { height: 10px; }
+
+        .im-battery {
+          width: 21px;
+          height: 10px;
+          border: 1.5px solid #111827;
+          border-radius: 3px;
+          position: relative;
+        }
+
+        .im-battery::before {
+          content: "";
+          position: absolute;
+          right: -4px;
+          top: 3px;
+          width: 2px;
+          height: 4px;
+          background: #111827;
+          border-radius: 0 2px 2px 0;
+        }
+
+        .im-battery::after {
+          content: "";
+          position: absolute;
+          left: 2px;
+          top: 2px;
+          width: 13px;
+          height: 4px;
+          border-radius: 2px;
+          background: #111827;
+        }
+
+        .im-page {
+          flex: 1;
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          background: #fff;
+        }
+
+        .im-page.soft {
+          background: #f6f7f8;
+        }
+
+        .im-head {
+          position: relative;
+          flex: none;
+          padding: 8px 18px 10px;
+          background: #fff;
+          z-index: 5;
+        }
+
+        .im-head.tint {
+          background: linear-gradient(180deg, #eafff9 0%, #fff 84%);
+        }
+
+        .im-title-row {
+          height: 34px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+        }
+
+        .im-title {
+          font-size: 17px;
+          font-weight: 900;
+          color: #232a35;
+          line-height: 1;
+        }
+
+        .im-tabs {
+          position: absolute;
+          left: 0;
+          top: 6px;
+          display: flex;
+          gap: 18px;
+          align-items: center;
+        }
+
+        .im-tab {
+          color: #9aa3ad;
+          font-size: 16px;
+          font-weight: 800;
+        }
+
+        .im-tab.active {
+          color: #22c7a5;
+        }
+
+        .im-back,
+        .im-more,
+        .im-add {
+          position: absolute;
+          top: 0;
+          width: 34px;
+          height: 34px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          color: #202833;
+          font-size: 25px;
+          font-weight: 500;
+        }
+
+        .im-back { left: -8px; }
+        .im-more { right: -8px; font-size: 24px; transform: translateY(-2px); }
+        .im-add { right: -4px; color: #22c7a5; font-size: 25px; font-weight: 800; }
+
+        .im-add-link {
+          position: absolute;
+          right: -2px;
+          top: 5px;
+          height: 30px;
+          color: #6b7280;
+          font-size: 13px;
+          font-weight: 800;
+        }
+
+        .im-search-row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .im-search {
+          height: 38px;
+          border-radius: 999px;
+          border: 1.5px solid #45d7bd;
+          background: #fff;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 0 12px;
+          flex: 1;
+          min-width: 0;
+          color: #95a0aa;
+          font-size: 13px;
+          box-shadow: 0 1px 0 rgba(34, 199, 165, .05);
+        }
+
+        .im-search.gray {
+          border: 0;
+          background: #f5f8fa;
+          border-radius: 9px;
+        }
+
+        .im-search input {
+          flex: 1;
+          min-width: 0;
+          border: 0;
+          outline: 0;
+          background: transparent;
+          font-size: 13px;
+          color: #222b36;
+        }
+
+        .im-search-icon {
+          width: 14px;
+          height: 14px;
+          border: 2px solid #22c7a5;
+          border-radius: 50%;
+          display: inline-block;
+          position: relative;
+          flex: none;
+        }
+
+        .im-search-icon::after {
+          content: "";
+          width: 7px;
+          height: 2px;
+          background: #22c7a5;
+          border-radius: 2px;
+          position: absolute;
+          right: -6px;
+          bottom: -3px;
+          transform: rotate(45deg);
+        }
+
+        .im-clear {
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          background: #e6e9ec;
+          color: #8d96a0;
+          font-size: 16px;
+          line-height: 20px;
+          flex: none;
+        }
+
+        .im-content {
+          flex: 1;
+          min-height: 0;
+          overflow: auto;
+          padding: 0 18px 86px;
+          scrollbar-width: none;
+        }
+
+        .im-content::-webkit-scrollbar {
+          width: 0;
+        }
+
+        .im-content.edge {
+          padding-left: 0;
+          padding-right: 0;
+        }
+
+        .im-list {
+          display: grid;
+          gap: 0;
+        }
+
+        .im-row {
+          min-height: 64px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 9px 0;
+          border-bottom: 1px solid rgba(229, 231, 235, .65);
+          text-align: left;
+          width: 100%;
+        }
+
+        .im-row.compact {
+          min-height: 58px;
+        }
+
+        .im-row.no-line {
+          border-bottom: 0;
+        }
+
+        .im-row-main {
+          min-width: 0;
+          flex: 1;
+        }
+
+        .im-row-title {
+          color: #222b36;
+          font-size: 15px;
+          font-weight: 900;
+          line-height: 1.25;
+        }
+
+        .im-row-sub {
+          margin-top: 4px;
+          color: #98a1aa;
+          font-size: 12px;
+          line-height: 1.35;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .im-avatar {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex: none;
+          color: #fff;
+          font-size: 16px;
+          font-weight: 900;
+          background: linear-gradient(135deg, #31d3b3, #32b7f0);
+          box-shadow: inset 0 0 0 1px rgba(255,255,255,.24);
+        }
+
+        .im-avatar.friend { background: linear-gradient(135deg, #1ed8b4, #24c2a7); }
+        .im-avatar.group { background: linear-gradient(135deg, #4bc0ff, #24a9e8); }
+        .im-avatar.orange { background: linear-gradient(135deg, #ffbb73, #f08f49); }
+        .im-avatar.blue { background: linear-gradient(135deg, #7dc6ff, #5b8df6); }
+        .im-avatar.pink { background: linear-gradient(135deg, #ffa6c4, #f4769e); }
+        .im-avatar.dark { background: linear-gradient(135deg, #1f2937, #475569); }
+
+        .im-dot-badge {
+          min-width: 18px;
+          height: 18px;
+          padding: 0 5px;
+          border-radius: 999px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: #ff3365;
+          color: #fff;
+          font-size: 10px;
+          font-weight: 900;
+        }
+
+        .im-section-letter {
+          height: 28px;
+          display: flex;
+          align-items: center;
+          color: #a3abb4;
+          font-size: 13px;
+          font-weight: 800;
+        }
+
+        .im-alpha {
+          position: absolute;
+          right: 14px;
+          top: 246px;
+          display: grid;
+          gap: 3px;
+          color: #6b7280;
+          font-size: 10px;
+          line-height: 1;
+          text-align: center;
+          pointer-events: none;
+        }
+
+        .im-alpha .active {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          background: #22c7a5;
+          transform: translateX(-3px);
+        }
+
+        .im-bottom {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 74px;
+          padding: 7px 20px 10px;
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 4px;
+          background: rgba(255,255,255,.96);
+          border-top: 1px solid rgba(229, 231, 235, .8);
+          backdrop-filter: blur(12px);
+          z-index: 20;
+        }
+
+        .im-nav {
+          min-width: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          gap: 4px;
+          color: #9ca3af;
+          font-size: 11px;
+          font-weight: 800;
+        }
+
+        .im-nav .nav-mark {
+          width: 22px;
+          height: 22px;
+          border-radius: 7px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          color: inherit;
+          font-size: 15px;
+        }
+
+        .im-nav.active {
+          color: #22c7a5;
+        }
+
+        .im-menu {
+          position: absolute;
+          right: 16px;
+          top: 85px;
+          width: 126px;
+          border-radius: 7px;
+          background: #fff;
+          box-shadow: 0 10px 30px rgba(15, 23, 42, .16);
+          padding: 7px 0;
+          z-index: 30;
+        }
+
+        .im-menu::before {
+          content: "";
+          position: absolute;
+          top: -7px;
+          right: 12px;
+          border-left: 7px solid transparent;
+          border-right: 7px solid transparent;
+          border-bottom: 7px solid #fff;
+        }
+
+        .im-menu button {
+          width: 100%;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 0 14px;
+          color: #303846;
+          font-size: 13px;
+          font-weight: 800;
+          text-align: left;
+        }
+
+        .im-mini-icon {
+          width: 20px;
+          color: #5f6b7a;
+          text-align: center;
+          font-size: 16px;
+          flex: none;
+        }
+
+        .im-empty {
+          min-height: 500px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          color: #adb5bd;
+          font-size: 14px;
+          gap: 18px;
+        }
+
+        .im-empty-box {
+          width: 132px;
+          height: 96px;
+          position: relative;
+          opacity: .75;
+        }
+
+        .im-empty-box::before {
+          content: "";
+          position: absolute;
+          left: 20px;
+          top: 22px;
+          width: 90px;
+          height: 60px;
+          border-radius: 12px 12px 18px 18px;
+          background: linear-gradient(135deg, #dffaf2, #7fe3ca);
+          transform: skewY(-7deg);
+        }
+
+        .im-empty-box::after {
+          content: "";
+          position: absolute;
+          right: 30px;
+          bottom: 20px;
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          background: rgba(255,255,255,.8);
+          box-shadow: -38px -12px 0 rgba(255,255,255,.35);
+        }
+
+        .im-result-title {
+          margin: 22px 0 7px;
+          color: #56616f;
+          font-size: 13px;
+          font-weight: 900;
+        }
+
+        .im-more-link {
+          margin: 3px 0 20px;
+          color: #24c9a9;
+          font-size: 13px;
+          font-weight: 900;
+        }
+
+        .im-pill-btn {
+          height: 36px;
+          min-width: 74px;
+          padding: 0 20px;
+          border-radius: 999px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          background: #27c8a8;
+          font-size: 14px;
+          font-weight: 900;
+          flex: none;
+        }
+
+        .im-pill-btn.full {
+          width: 100%;
+          height: 52px;
+          font-size: 18px;
+        }
+
+        .im-pill-btn.light {
+          background: #e9fbf6;
+          color: #24c5a6;
+        }
+
+        .im-pill-btn.danger {
+          background: #ff2c62;
+          color: #fff;
+        }
+
+        .im-profile-band {
+          margin: 0 -18px 18px;
+          padding: 18px 18px 22px;
+          background: #f7f8f9;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .im-profile-band .im-avatar {
+          width: 72px;
+          height: 72px;
+          font-size: 24px;
+        }
+
+        .im-profile-name {
+          color: #202833;
+          font-size: 20px;
+          line-height: 1.25;
+          font-weight: 900;
+        }
+
+        .im-profile-line {
+          margin-top: 6px;
+          color: #9aa3ad;
+          font-size: 14px;
+          line-height: 1.35;
+        }
+
+        .im-label {
+          margin: 16px 0 9px;
+          color: #222b36;
+          font-size: 15px;
+          font-weight: 900;
+        }
+
+        .im-textarea {
+          width: 100%;
+          min-height: 122px;
+          resize: none;
+          border: 0;
+          outline: 0;
+          border-radius: 8px;
+          background: #f7f7f8;
+          padding: 14px;
+          color: #3c4450;
+          font-size: 15px;
+          line-height: 1.55;
+        }
+
+        .im-actions {
+          display: grid;
+          gap: 14px;
+          margin-top: 22px;
+        }
+
+        .im-detail-head {
+          padding: 22px 0 18px;
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .im-detail-head .im-avatar {
+          width: 72px;
+          height: 72px;
+          font-size: 24px;
+        }
+
+        .im-detail-card {
+          margin-top: 14px;
+          display: grid;
+          gap: 14px;
+        }
+
+        .im-soft-btn {
+          height: 50px;
+          border-radius: 999px;
+          background: #eafbf7;
+          color: #22c7a5;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 7px;
+          font-size: 18px;
+          font-weight: 900;
+        }
+
+        .im-settings-list {
+          display: grid;
+          gap: 16px;
+          padding-top: 10px;
+        }
+
+        .im-settings-card {
+          overflow: hidden;
+          border-radius: 9px;
+          background: #fff;
+        }
+
+        .im-setting-row {
+          min-height: 52px;
+          padding: 0 14px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          border-bottom: 1px solid #f1f2f4;
+          color: #303846;
+          font-size: 15px;
+          font-weight: 800;
+        }
+
+        .im-setting-row:last-child {
+          border-bottom: 0;
+        }
+
+        .im-setting-value {
+          color: #9aa3ad;
+          font-weight: 700;
+        }
+
+        .im-toggle {
+          width: 46px;
+          height: 26px;
+          border-radius: 999px;
+          background: #e5e7eb;
+          padding: 3px;
+          display: inline-flex;
+          justify-content: flex-start;
+          transition: .18s ease;
+        }
+
+        .im-toggle::before {
+          content: "";
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: #fff;
+          box-shadow: 0 1px 4px rgba(15,23,42,.16);
+        }
+
+        .im-toggle.on {
+          background: #27c8a8;
+          justify-content: flex-end;
+        }
+
+        .im-delete {
+          height: 52px;
+          border-radius: 9px;
+          background: #fff;
+          color: #ff2c62;
+          font-size: 15px;
+          font-weight: 900;
+          text-align: center;
+        }
+
+        .im-chat-list {
+          padding: 12px 18px 150px;
+          flex: 1;
+          min-height: 0;
+          overflow: auto;
+          background: #f7f7f8;
+        }
+
+        .im-chat-time {
+          margin: 10px 0 18px;
+          color: #b0b7bf;
+          font-size: 12px;
+          text-align: center;
+          font-weight: 700;
+        }
+
+        .im-msg {
+          display: flex;
+          gap: 9px;
+          margin-bottom: 18px;
+          align-items: flex-start;
+        }
+
+        .im-msg.mine {
+          justify-content: flex-end;
+        }
+
+        .im-msg .im-avatar {
+          width: 40px;
+          height: 40px;
+          font-size: 14px;
+        }
+
+        .im-bubble {
+          max-width: 230px;
+          padding: 12px 13px;
+          border-radius: 8px;
+          background: #fff;
+          color: #303846;
+          font-size: 14px;
+          line-height: 1.45;
+          box-shadow: 0 1px 2px rgba(15,23,42,.04);
+        }
+
+        .im-msg.mine .im-bubble {
+          background: #27c8a8;
+          color: #fff;
+        }
+
+        .im-composer {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          padding: 10px 14px 12px;
+          background: #fff;
+          border-top: 1px solid #eceff2;
+          z-index: 25;
+        }
+
+        .im-compose-main {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .im-round {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          border: 2px solid #2f3742;
+          color: #2f3742;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          flex: none;
+          font-weight: 900;
+        }
+
+        .im-input {
+          flex: 1;
+          height: 38px;
+          border: 0;
+          outline: 0;
+          border-radius: 9px;
+          background: #f6f7f8;
+          padding: 0 12px;
+          font-size: 14px;
+        }
+
+        .im-tool-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 16px 14px;
+          padding: 22px 5px 8px;
+        }
+
+        .im-tool {
+          display: grid;
+          justify-items: center;
+          gap: 8px;
+          color: #6b7280;
+          font-size: 12px;
+          font-weight: 800;
+        }
+
+        .im-tool-icon {
+          width: 54px;
+          height: 54px;
+          border-radius: 14px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: #f7f8fa;
+          color: #222b36;
+          font-size: 23px;
+        }
+
+        .im-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0,0,0,.62);
+          z-index: 60;
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+          padding: 12px;
+        }
+
+        .im-sheet {
+          width: 100%;
+          border-radius: 14px 14px 0 0;
+          background: #fff;
+          padding: 18px 16px calc(16px + env(safe-area-inset-bottom));
+          animation: imRise .16s ease-out;
+        }
+
+        .im-sheet-title {
+          text-align: center;
+          font-size: 16px;
+          font-weight: 900;
+          margin-bottom: 18px;
+        }
+
+        .im-sheet-input {
+          height: 50px;
+          width: 100%;
+          border: 0;
+          outline: 0;
+          border-radius: 7px;
+          background: #f7f8fa;
+          padding: 0 14px;
+          color: #303846;
+          font-size: 15px;
+        }
+
+        .im-sheet-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-top: 52px;
+        }
+
+        .im-sheet-action {
+          height: 48px;
+          border-radius: 999px;
+          background: #f7f8fa;
+          color: #303846;
+          font-size: 16px;
+          font-weight: 900;
+        }
+
+        .im-sheet-action.primary {
+          background: #27c8a8;
+          color: #fff;
+        }
+
+        .im-confirm {
+          width: 304px;
+          border-radius: 14px;
+          background: #fff;
+          padding: 30px 22px 24px;
+          margin-bottom: 270px;
+          text-align: center;
+        }
+
+        .im-confirm-text {
+          font-size: 18px;
+          line-height: 1.45;
+          color: #303846;
+          font-weight: 900;
+        }
+
+        .im-confirm-text strong {
+          color: #ff2c62;
+        }
+
+        .im-confirm-actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+          margin-top: 26px;
+        }
+
+        .im-call-sheet {
+          width: 100%;
+          border-radius: 14px 14px 0 0;
+          background: #fff;
+          overflow: hidden;
+          animation: imRise .16s ease-out;
+        }
+
+        .im-call-option,
+        .im-call-cancel {
+          height: 52px;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          color: #22c7a5;
+          font-size: 15px;
+          font-weight: 900;
+          border-bottom: 1px solid #f0f2f4;
+        }
+
+        .im-call-cancel {
+          color: #6b7280;
+          border-top: 5px solid #f5f6f7;
+          border-bottom: 0;
+        }
+
+        .im-toast {
+          position: absolute;
+          left: 50%;
+          top: 48%;
+          transform: translate(-50%, -50%);
+          max-width: 280px;
+          min-height: 44px;
+          padding: 11px 18px;
+          border-radius: 9px;
+          background: rgba(22, 24, 28, .88);
+          color: #fff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          font-size: 15px;
+          font-weight: 800;
+          line-height: 1.35;
+          z-index: 80;
+          box-shadow: 0 8px 24px rgba(0,0,0,.18);
+        }
+
+        @keyframes imRise {
+          from { transform: translateY(24px); opacity: .8; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 520px) {
+          body.im-redesign-body {
+            padding: 0;
+            background: #fff;
+          }
+
+          .im-phone {
+            width: 100vw;
+            height: 100vh;
+            min-height: 0;
+            border-radius: 0;
+            border: 0;
+            box-shadow: none;
+          }
+        }
+      `;
+      document.head.appendChild(style);
+
+      const contacts = [
+        { letter: "C", name: "陈世敏", area: "广东省广州市天河区", phone: "130 3325 8577", avatar: "dark" },
+        { letter: "C", name: "程婷婷", area: "广东省广州市天河区", phone: "130 3325 8577", avatar: "orange" },
+        { letter: "D", name: "赵立民", area: "广东省广州市天河区", phone: "130 3325 8577", avatar: "orange" },
+        { letter: "L", name: "李杰", area: "广东省广州市天河区", phone: "130 3325 8577", avatar: "blue" },
+        { letter: "Q", name: "钱韵澄", area: "广东省广州市天河区", phone: "130 3325 8577", avatar: "dark" },
+        { letter: "S", name: "孙玉轩", area: "广东省广州市天河区", phone: "130 3325 8577", avatar: "orange" }
+      ];
+
+      const searchContacts = [
+        { name: "小世敏", area: "广东省广州市天河区", phone: "130 3325 8577", avatar: "dark" },
+        { name: "程小婷", area: "广东省广州市天河区", phone: "130 3325 8577", avatar: "orange" },
+        { name: "赵小民", area: "广东省广州市天河区", phone: "130 3325 8577", avatar: "orange" }
+      ];
+
+      const groups = [
+        "小咸鱼躺平聊天群(22)",
+        "快乐小星球非官方分部群(4)",
+        "人类迷惑行为小观察群(999)"
+      ];
+
+      const newFriends = [
+        { name: "徐世敏", sub: "好久不见！加个微信，有空聚聚呀...", status: "待通过", tone: "green", avatar: "dark" },
+        { name: "许昌", sub: "你好呀！通过一下呀", status: "已添加", tone: "gray", avatar: "blue" },
+        { name: "张敏", sub: "是我是我！快通过，出来约饭啦！", status: "已添加", tone: "gray", avatar: "orange" },
+        { name: "徐世敏", sub: "你好呀！通过一下呀", status: "已拒绝", tone: "gray", avatar: "dark" },
+        { name: "咸蛋黄", sub: "是我是我！快通过，出来约饭啦！", status: "等待验证", tone: "green", avatar: "pink" }
+      ];
+
+      const state = {
+        page: "contacts",
+        history: [],
+        addOpen: false,
+        searchQuery: "",
+        addQuery: "",
+        requestText: "",
+        requestSent: false,
+        friendAccepted: false,
+        friendRejected: false,
+        remark: "徐世敏",
+        remarkDraft: "碳水化合物爱好者",
+        blacklist: false,
+        chatTools: false,
+        chatInput: "",
+        sheet: null,
+        toast: ""
+      };
+
+      document.body.className = "im-redesign-body";
+      document.body.innerHTML = `
+        <div class="im-phone">
+          <div class="im-screen">
+            <div class="im-status">
+              <span>09:41</span>
+              <span class="im-status-icons"><span class="im-signal"><i></i><i></i><i></i><i></i></span><span>5G</span><span class="im-battery"></span></span>
+            </div>
+            <div class="im-page" id="imPage"></div>
+          </div>
+        </div>
+      `;
+
+      const pageEl = document.getElementById("imPage");
+      const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      }[char]));
+
+      function avatar(item, large = false) {
+        return `<span class="im-avatar ${item.avatar || ""} ${large ? "large" : ""}">${esc(item.name || "友").slice(0, 1)}</span>`;
+      }
+
+      function statusbar() {
+        return "";
+      }
+
+      function route(page, opts = {}) {
+        if (opts.push !== false && state.page !== page) state.history.push(state.page);
+        state.page = page;
+        state.addOpen = false;
+        state.sheet = null;
+        Object.assign(state, opts);
+        render();
+      }
+
+      function back() {
+        state.page = state.history.pop() || "contacts";
+        state.addOpen = false;
+        state.sheet = null;
+        render();
+      }
+
+      function showToast(text) {
+        state.toast = text;
+        render();
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => {
+          state.toast = "";
+          render();
+        }, 1700);
+      }
+
+      function head(title, options = {}) {
+        const tint = options.tint ? " tint" : "";
+        const backBtn = options.back ? `<button class="im-back" data-action="back">‹</button>` : "";
+        const more = options.more ? `<button class="im-more" data-action="${options.more}">…</button>` : "";
+        const add = options.add ? `<button class="im-add" data-action="${options.add}">⊕</button>` : "";
+        const addText = options.addText ? `<button class="im-add-link" data-action="${options.addAction || "addFriend"}">${options.addText}</button>` : "";
+        const tabs = options.tabs ? `
+          <div class="im-tabs">
+            <button class="im-tab">消息</button>
+            <button class="im-tab active">通讯录</button>
+          </div>
+        ` : "";
+        const titleText = options.tabs || !title ? "" : `<div class="im-title">${esc(title)}</div>`;
+        return `
+          <header class="im-head${tint}">
+            <div class="im-title-row">
+              ${tabs}${backBtn}${titleText}${more}${add}${addText}
+            </div>
+            ${options.search ? options.search : ""}
+            ${state.addOpen ? addMenu() : ""}
+          </header>
+        `;
+      }
+
+      function searchBox({ placeholder, value, id, gray = false }) {
+        return `
+          <div class="im-search ${gray ? "gray" : ""}">
+            <span class="im-search-icon"></span>
+            <input id="${id}" value="${esc(value)}" placeholder="${esc(placeholder)}" autocomplete="off">
+            ${value ? `<button class="im-clear" data-action="clearInput" data-field="${id}">×</button>` : ""}
+          </div>
+        `;
+      }
+
+      function bottomNav() {
+        return `
+          <nav class="im-bottom">
+            <button class="im-nav" data-action="navToast"><span class="nav-mark">▥</span><span>学习</span></button>
+            <button class="im-nav" data-action="navToast"><span class="nav-mark">▷</span><span>发现</span></button>
+            <button class="im-nav active" data-action="contacts"><span class="nav-mark">▣</span><span>消息</span></button>
+            <button class="im-nav" data-action="navToast"><span class="nav-mark">◉</span><span>我的</span></button>
+          </nav>
+        `;
+      }
+
+      function addMenu() {
+        return `
+          <div class="im-menu">
+            <button data-action="addFriend"><span class="im-mini-icon">⌘</span>添加好友</button>
+            <button data-action="groups"><span class="im-mini-icon">☷</span>创建群聊</button>
+          </div>
+        `;
+      }
+
+      function renderContacts() {
+        const grouped = contacts.reduce((map, item) => {
+          map[item.letter] = map[item.letter] || [];
+          map[item.letter].push(item);
+          return map;
+        }, {});
+        return `
+          ${head("通讯录", {
+            tint: true,
+            tabs: true,
+            add: "toggleAdd",
+            search: `<button class="im-search-row" data-action="search">${searchBox({ placeholder: "请输入您要搜索的关键字", value: "", id: "fakeSearch", gray: true })}</button>`
+          })}
+          <main class="im-content">
+            <div class="im-list">
+              <button class="im-row compact" data-action="newFriends">
+                <span class="im-avatar friend">友</span>
+                <span class="im-row-main"><span class="im-row-title">新的朋友</span></span>
+                <span class="im-dot-badge">9</span>
+              </button>
+              <button class="im-row compact" data-action="groups">
+                <span class="im-avatar group">群</span>
+                <span class="im-row-main"><span class="im-row-title">我的群聊</span></span>
+              </button>
+              ${Object.keys(grouped).map(letter => `
+                <div class="im-section-letter">${letter}</div>
+                ${grouped[letter].map(item => `
+                  <button class="im-row" data-action="friendDetail">
+                    ${avatar(item)}
+                    <span class="im-row-main"><span class="im-row-title">${esc(item.name)}</span></span>
+                  </button>
+                `).join("")}
+              `).join("")}
+            </div>
+          </main>
+          <div class="im-alpha">${"ABCDEFGHIJKLMNOPQRSTUVWXYZ#".split("").map(ch => `<span class="${ch === "C" ? "active" : ""}">${ch}</span>`).join("")}</div>
+          ${bottomNav()}
+        `;
+      }
+
+      function renderSearch() {
+        const q = state.searchQuery.trim();
+        const hasResult = q.length > 0;
+        return `
+          ${head("", {
+            back: true,
+            search: `<div class="im-search-row">${searchBox({ placeholder: "请输入您要搜索的关键字", value: state.searchQuery, id: "searchInput" })}</div>`
+          })}
+          <main class="im-content">
+            ${hasResult ? `
+              <div class="im-result-title">联系人</div>
+              ${searchContacts.map(item => `
+                <button class="im-row compact" data-action="friendDetail">
+                  ${avatar(item)}
+                  <span class="im-row-main"><span class="im-row-title">${esc(item.name)}</span></span>
+                </button>
+              `).join("")}
+              <button class="im-more-link" data-action="searchMoreContacts">展示更多联系人</button>
+              <div class="im-result-title">群聊</div>
+              ${groups.map(name => `
+                <button class="im-row compact" data-action="groups">
+                  <span class="im-avatar group">群</span>
+                  <span class="im-row-main"><span class="im-row-title">${esc(name)}</span></span>
+                </button>
+              `).join("")}
+              <button class="im-more-link" data-action="searchMoreGroups">展示更多群</button>
+            ` : ""}
+          </main>
+        `;
+      }
+
+      function renderAddFriend() {
+        const q = state.addQuery.trim();
+        const exists = q === "13033258577" || q === "130 3325 8577" || q === "小";
+        return `
+          ${head("", {
+            back: true,
+            search: `<div class="im-search-row">${searchBox({ placeholder: "请输入手机号或昵称", value: state.addQuery, id: "addInput" })}</div>`
+          })}
+          <main class="im-content">
+            ${q && exists ? `
+              <button class="im-row no-line" data-action="friendRequest">
+                ${avatar({ name: "小世敏", avatar: "dark" })}
+                <span class="im-row-main">
+                  <span class="im-row-title">小世敏</span>
+                  <span class="im-row-sub">广东省广州市天河区<br>130 3325 8577</span>
+                </span>
+                <span class="im-pill-btn">添加</span>
+              </button>
+            ` : q.length > 7 ? `
+              <div class="im-empty">
+                <div class="im-empty-box"></div>
+                <div>未搜索到好友</div>
+              </div>
+            ` : `
+              <div class="im-empty">
+                <div class="im-empty-box"></div>
+                <div>未搜索到好友</div>
+              </div>
+            `}
+          </main>
+        `;
+      }
+
+      function renderFriendRequest() {
+        return `
+          ${head("申请添加好友", { back: true })}
+          <main class="im-content">
+            <div class="im-profile-band">
+              ${avatar({ name: "徐世敏", avatar: "pink" }, true)}
+              <div>
+                <div class="im-profile-name">徐世敏</div>
+                <div class="im-profile-line">广东省广州市天河区<br>130 3325 8577</div>
+              </div>
+            </div>
+            <div class="im-label">打招呼内容</div>
+            <textarea id="requestText" class="im-textarea" placeholder="请输入打招呼内容">${esc(state.requestText)}</textarea>
+            <div class="im-actions">
+              <button class="im-pill-btn full" data-action="sendRequest">发送</button>
+            </div>
+          </main>
+        `;
+      }
+
+      function renderNewFriends() {
+        return `
+          ${head("新的朋友", { back: true, addText: "添加朋友", addAction: "addFriend" })}
+          <main class="im-content">
+            ${newFriends.length ? newFriends.map((item, index) => `
+              <button class="im-row" data-action="${index === 0 ? "verifyFriend" : "friendDetail"}">
+                ${avatar(item)}
+                <span class="im-row-main">
+                  <span class="im-row-title">${esc(item.name)}</span>
+                  <span class="im-row-sub">${esc(item.sub)}</span>
+                </span>
+                <span style="color:${item.tone === "green" ? "#22c7a5" : "#a1a8b0"};font-size:13px;font-weight:900;">${esc(item.status)}</span>
+              </button>
+            `).join("") : `
+              <div class="im-empty">
+                <div class="im-empty-box"></div>
+                <div>暂无新的朋友</div>
+              </div>
+            `}
+          </main>
+        `;
+      }
+
+      function renderVerifyFriend() {
+        return `
+          ${head("申请添加好友", { back: true })}
+          <main class="im-content">
+            <div class="im-profile-band">
+              ${avatar({ name: "徐世敏", avatar: "pink" }, true)}
+              <div>
+                <div class="im-profile-name">徐世敏</div>
+                <div class="im-profile-line">地区：广东省广州市天河区<br>电话：130 3325 8577</div>
+              </div>
+            </div>
+            <div class="im-label">打招呼内容</div>
+            <div class="im-textarea">哈喽！在超凡摄影群看到你的作品，太喜欢了，想请教下</div>
+            <div class="im-actions">
+              ${state.friendAccepted ? `<button class="im-pill-btn full light">等待对方验证</button>` : state.friendRejected ? `<button class="im-pill-btn full danger">对方已拒绝</button>` : `
+                <button class="im-pill-btn full" data-action="acceptFriend">通过好友申请</button>
+                <button class="im-pill-btn full danger" data-action="rejectFriend">拒绝好友申请</button>
+              `}
+            </div>
+          </main>
+        `;
+      }
+
+      function renderFriendDetail() {
+        const withRemark = state.remark !== "徐世敏";
+        return `
+          ${head("", { back: true, more: "friendSettings" })}
+          <main class="im-content">
+            <div class="im-detail-head">
+              ${avatar({ name: "徐世敏", avatar: "pink" }, true)}
+              <div>
+                <div class="im-profile-name">徐世敏</div>
+                <div class="im-profile-line">${withRemark ? `昵称：快乐加载中<br>` : ""}地区：广东省广州市天河区<br>电话：130 3325 8577</div>
+              </div>
+            </div>
+            <div class="im-detail-card">
+              <button class="im-soft-btn" data-action="chat">▣ 发消息</button>
+              <button class="im-soft-btn" data-action="callSheet">☎ 语音/视频</button>
+            </div>
+          </main>
+        `;
+      }
+
+      function renderFriendSettings() {
+        return `
+          ${head("朋友设置", { back: true })}
+          <main class="im-content im-page soft">
+            <div class="im-settings-list">
+              <div class="im-settings-card">
+                <button class="im-setting-row" data-action="remarkSheet">
+                  <span>设置朋友名称</span>
+                  <span class="im-setting-value">${esc(state.remark)} ›</span>
+                </button>
+                <button class="im-setting-row" data-action="toggleBlack">
+                  <span>拉黑好友</span>
+                  <span class="im-toggle ${state.blacklist ? "on" : ""}"></span>
+                </button>
+              </div>
+              <button class="im-delete" data-action="deleteConfirm">删除好友</button>
+            </div>
+          </main>
+        `;
+      }
+
+      function renderChat() {
+        return `
+          ${head("李臻卓", { back: true, more: "friendSettings" })}
+          <main class="im-chat-list">
+            <div class="im-chat-time">2025-08-26 13:22</div>
+            <div class="im-msg">
+              ${avatar({ name: "麻烦", avatar: "orange" })}
+              <div class="im-bubble">您好 麻烦简单描述一下你的问题</div>
+            </div>
+            <div class="im-msg mine">
+              <div class="im-bubble">您好</div>
+              ${avatar({ name: "我", avatar: "friend" })}
+            </div>
+          </main>
+          <div class="im-composer">
+            <div class="im-compose-main">
+              <button class="im-round" data-action="voiceToast">)))</button>
+              <input id="chatInput" class="im-input" value="${esc(state.chatInput)}" placeholder="请输入..." autocomplete="off">
+              <button class="im-round" data-action="emojiToast">☺</button>
+              <button class="im-round" data-action="toggleTools">＋</button>
+            </div>
+            ${state.chatTools ? `
+              <div class="im-tool-grid">
+                ${[
+                  ["▧", "图片"], ["●", "相机"], ["▣", "红包"], ["▤", "直播"],
+                  ["☎", "语音通话"], ["▮", "视频通话"]
+                ].map(([icon, label]) => `
+                  <button class="im-tool" data-action="${label.includes("通话") ? "callSheet" : "toolToast"}" data-label="${label}">
+                    <span class="im-tool-icon">${icon}</span>
+                    <span>${label}</span>
+                  </button>
+                `).join("")}
+              </div>
+            ` : ""}
+          </div>
+        `;
+      }
+
+      function overlays() {
+        if (state.sheet === "remark") {
+          return `
+            <div class="im-overlay">
+              <div class="im-sheet">
+                <div class="im-sheet-title">修改朋友备注名</div>
+                <input id="remarkInput" class="im-sheet-input" value="${esc(state.remarkDraft)}" maxlength="20">
+                <div class="im-sheet-actions">
+                  <button class="im-sheet-action" data-action="closeSheet">取消</button>
+                  <button class="im-sheet-action primary" data-action="saveRemark">确认</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        if (state.sheet === "delete") {
+          return `
+            <div class="im-overlay" style="align-items:center;">
+              <div class="im-confirm">
+                <div class="im-confirm-text">请再次确认是否删除好友<br>删除后将同时<strong>删除聊天记录?</strong></div>
+                <div class="im-confirm-actions">
+                  <button class="im-sheet-action" data-action="closeSheet">取消</button>
+                  <button class="im-sheet-action primary" data-action="deleteFriend">确认</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+        if (state.sheet === "call") {
+          return `
+            <div class="im-overlay">
+              <div class="im-call-sheet">
+                <button class="im-call-option" data-action="callToast">▮ 视频通话</button>
+                <button class="im-call-option" data-action="callToast">☎ 语音通话</button>
+                <button class="im-call-cancel" data-action="closeSheet">取消</button>
+              </div>
+            </div>
+          `;
+        }
+        return "";
+      }
+
+      function toast() {
+        return state.toast ? `<div class="im-toast">${esc(state.toast)}</div>` : "";
+      }
+
+      function render() {
+        const pages = {
+          contacts: renderContacts,
+          search: renderSearch,
+          addFriend: renderAddFriend,
+          friendRequest: renderFriendRequest,
+          newFriends: renderNewFriends,
+          verifyFriend: renderVerifyFriend,
+          friendDetail: renderFriendDetail,
+          friendSettings: renderFriendSettings,
+          chat: renderChat
+        };
+        pageEl.className = `im-page ${state.page === "friendSettings" ? "soft" : ""}`;
+        pageEl.innerHTML = `${pages[state.page]()}${overlays()}${toast()}`;
+        bind();
+      }
+
+      function bind() {
+        pageEl.querySelectorAll("[data-action]").forEach(el => {
+          el.addEventListener("click", (event) => {
+            const action = el.dataset.action;
+            event.stopPropagation();
+            if (action === "back") back();
+            if (action === "contacts") route("contacts", { push: false });
+            if (action === "search") route("search", { searchQuery: "" });
+            if (action === "toggleAdd") { state.addOpen = !state.addOpen; render(); }
+            if (action === "addFriend") route("addFriend", { addQuery: "" });
+            if (action === "groups") showToast("创建群聊入口已预留");
+            if (action === "newFriends") route("newFriends");
+            if (action === "friendDetail") route("friendDetail");
+            if (action === "friendRequest") route("friendRequest", { requestText: "哈喽！哈喽！久仰大名，冒昧加你，多指教啦～" });
+            if (action === "sendRequest") { state.requestSent = true; showToast("✓ 已发送申请"); }
+            if (action === "verifyFriend") route("verifyFriend");
+            if (action === "acceptFriend") { state.friendAccepted = true; showToast("已通过好友申请"); }
+            if (action === "rejectFriend") { state.friendRejected = true; showToast("已拒绝好友申请"); }
+            if (action === "friendSettings") route("friendSettings");
+            if (action === "chat") route("chat");
+            if (action === "callSheet") { state.sheet = "call"; render(); }
+            if (action === "remarkSheet") { state.remarkDraft = state.remark; state.sheet = "remark"; render(); }
+            if (action === "toggleBlack") { state.blacklist = !state.blacklist; render(); }
+            if (action === "deleteConfirm") { state.sheet = "delete"; render(); }
+            if (action === "closeSheet") { state.sheet = null; render(); }
+            if (action === "saveRemark") {
+              const input = document.getElementById("remarkInput");
+              const value = (input?.value || "").trim();
+              if (value.length < 4 || value.length > 12) {
+                showToast("名称长度已超上限，限4-12字");
+                return;
+              }
+              state.remark = value;
+              state.sheet = null;
+              showToast("备注已更新");
+            }
+            if (action === "deleteFriend") { state.sheet = null; route("contacts", { push: false }); showToast("好友已删除"); }
+            if (action === "toggleTools") { state.chatTools = !state.chatTools; render(); }
+            if (action === "toolToast") showToast(`${el.dataset.label}功能已预留`);
+            if (action === "voiceToast") showToast("切换语音输入");
+            if (action === "emojiToast") showToast("表情面板已预留");
+            if (action === "callToast") { state.sheet = null; showToast("正在呼叫..."); }
+            if (action === "navToast") showToast("该栏目为外部业务入口");
+            if (action === "searchMoreContacts") showToast("已展示全部联系人结果");
+            if (action === "searchMoreGroups") showToast("已展示全部群聊结果");
+            if (action === "clearInput") {
+              const field = el.dataset.field;
+              if (field === "searchInput") state.searchQuery = "";
+              if (field === "addInput") state.addQuery = "";
+              render();
+            }
+          });
+        });
+        const searchInput = document.getElementById("searchInput");
+        if (searchInput) {
+          searchInput.focus();
+          searchInput.addEventListener("input", () => {
+            state.searchQuery = searchInput.value;
+            render();
+          });
+        }
+        const addInput = document.getElementById("addInput");
+        if (addInput) {
+          addInput.focus();
+          addInput.addEventListener("input", () => {
+            state.addQuery = addInput.value;
+            render();
+          });
+        }
+        const requestText = document.getElementById("requestText");
+        if (requestText) {
+          requestText.addEventListener("input", () => {
+            state.requestText = requestText.value;
+          });
+        }
+        const chatInput = document.getElementById("chatInput");
+        if (chatInput) {
+          chatInput.addEventListener("input", () => {
+            state.chatInput = chatInput.value;
+          });
+        }
+        const remarkInput = document.getElementById("remarkInput");
+        if (remarkInput) {
+          remarkInput.focus();
+          remarkInput.addEventListener("input", () => {
+            state.remarkDraft = remarkInput.value;
+          });
+        }
+      }
+
+      render();
+    })();
+  </script>
 </body>
 </html>
