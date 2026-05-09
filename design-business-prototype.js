@@ -1,9 +1,9 @@
 (() => {
   const roles = [
-    { id: "agent", name: "华南代理负责人", scope: "下级 28 家门店", desc: "可查看下级门店群、直播群、课程群，可处理同步与异常" },
-    { id: "store", name: "南山店长", scope: "南山门店", desc: "可管理本门店客户群，处理本店客户同步" },
-    { id: "anchor", name: "主播小李", scope: "五一租赁专场", desc: "可管理直播群，查看直播覆盖客户和服务链路" },
-    { id: "course", name: "课程负责人", scope: "设备租赁基础课", desc: "可管理课程群，查看录播内容和课程客户" }
+    { id: "buyer", name: "普通客户", scope: "个人身份", desc: "只查看自己的消息和已加入群聊，不参与门店群维护" },
+    { id: "staff", name: "南山店员", scope: "南山门店", desc: "切换到店员身份后，可查看本门店自动创建的客户群" },
+    { id: "manager", name: "南山店长", scope: "南山门店", desc: "作为门店群群管，维护本店白名单客户与群内沟通" },
+    { id: "agent", name: "华南代理", scope: "A / B / C 门店", desc: "代理邀请的门店会自动生成门店客户群，代理为群主" }
   ];
 
   const groups = [
@@ -12,71 +12,83 @@
       name: "南山门店客户群",
       type: "门店群",
       source: "南山门店",
-      owner: "王店长",
+      owner: "华南代理",
+      managers: "王店长、李店员",
       customers: 221,
-      members: 238,
-      internal: 17,
-      pending: 23,
-      status: "待人工确认",
-      tone: "amber",
+      members: 224,
+      internal: 3,
+      excluded: 9,
+      pending: 0,
+      status: "已自动创建",
+      tone: "green",
       filter: "store",
+      visible: ["agent", "staff", "manager"],
       letter: "N",
-      summary: "新增客户 20 人，移除客户 3 人，新增店员 1 人",
-      stage: "门店客户经营",
+      summary: "切换到南山门店身份后自动可见；白名单客户入群，黑名单客户不入群。",
+      stage: "白名单客户群",
       latest: "今天 10:20"
     },
     {
       id: "g2",
-      name: "五一租赁专场直播群",
-      type: "直播群",
-      source: "五一租赁专场直播间",
-      owner: "主播小李",
-      customers: 352,
-      members: 387,
-      internal: 35,
-      pending: 42,
-      status: "进行中",
-      tone: "green",
-      filter: "live",
-      letter: "Z",
-      summary: "覆盖门店新增 2 家，去重后新增客户 42 人",
-      stage: "售前｜售中｜售后",
-      latest: "今天 11:42"
-    },
-    {
-      id: "g3",
       name: "福田旗舰店客户群",
       type: "门店群",
       source: "福田旗舰店",
-      owner: "待重新指定",
+      owner: "华南代理",
+      managers: "陈店长",
       customers: 501,
-      members: 512,
-      internal: 11,
-      pending: 6,
-      status: "群主异常",
-      tone: "red",
+      members: 503,
+      internal: 2,
+      excluded: 16,
+      pending: 0,
+      status: "已自动创建",
+      tone: "green",
       filter: "store",
+      visible: ["agent"],
       letter: "F",
-      summary: "原群主账号停用，建议代理或新店长重新指定群主",
-      stage: "异常待处理",
+      summary: "代理身份下自动生成的门店群；店长为群管，客户来自该门店白名单。",
+      stage: "白名单客户群",
       latest: "昨天 18:02"
     },
     {
+      id: "g3",
+      name: "宝安 A 店客户群",
+      type: "门店群",
+      source: "宝安 A 店",
+      owner: "华南代理",
+      managers: "许店长",
+      customers: 168,
+      members: 171,
+      internal: 3,
+      excluded: 4,
+      pending: 0,
+      status: "已自动创建",
+      tone: "green",
+      filter: "store",
+      visible: ["agent"],
+      letter: "B",
+      summary: "代理拓展门店后生成客户群，群主为代理，店长和店员为群管。",
+      stage: "白名单客户群",
+      latest: "05-08 16:30"
+    },
+    {
       id: "g4",
-      name: "设备租赁使用课程群",
-      type: "课程群",
-      source: "设备租赁基础课",
-      owner: "课程负责人张三",
-      customers: 180,
-      members: 188,
-      internal: 8,
-      pending: 7,
-      status: "分级同步",
-      tone: "violet",
-      filter: "course",
-      letter: "K",
-      summary: "课程可见门店新增 1 家，黑名单客户 6 人已排除",
-      stage: "录播内容触达",
+      name: "我的租赁咨询群",
+      type: "普通群聊",
+      source: "客户主动加入",
+      owner: "系统客服",
+      managers: "客服助手",
+      customers: 12,
+      members: 13,
+      internal: 1,
+      excluded: 0,
+      pending: 0,
+      status: "已加入",
+      tone: "blue",
+      filter: "joined",
+      visible: ["buyer", "staff", "manager", "agent"],
+      letter: "W",
+      summary: "普通客户身份下可查看自己已加入的群聊。",
+      stage: "我加入的群",
       latest: "今天 09:45"
     },
     {
@@ -85,43 +97,45 @@
       type: "代理群",
       source: "华南代理",
       owner: "华南代理负责人",
+      managers: "下级门店店长",
       customers: 0,
       members: 86,
       internal: 86,
+      excluded: 0,
       pending: 0,
       status: "正常",
       tone: "green",
-      filter: "mine",
+      filter: "managed",
+      visible: ["agent"],
       letter: "H",
-      summary: "代理与门店协同通知群，无客户成员",
+      summary: "代理与门店的内部协同群，无客户成员。",
       stage: "内部协同",
       latest: "05-07 20:12"
     }
   ];
 
   const customers = [
-    { id: "c1", name: "陈世敏", phone: "130 3325 8577", store: "南山门店", owner: "王店长", type: "门店客户", groupId: "g1", status: "待加入", letter: "C" },
-    { id: "c2", name: "程婷婷", phone: "138 2290 1121", store: "南山门店", owner: "李店员", type: "直播客户", groupId: "g2", status: "售前咨询", letter: "C" },
-    { id: "c3", name: "赵立民", phone: "139 8456 2910", store: "福田旗舰店", owner: "陈店长", type: "待移出", groupId: "g3", status: "待人工确认", letter: "Z" },
-    { id: "c4", name: "李杰", phone: "136 7788 4501", store: "课程可见门店", owner: "课程负责人张三", type: "课程客户", groupId: "g4", status: "已同步", letter: "L" },
-    { id: "c5", name: "钱韵澄", phone: "137 1209 7781", store: "南山门店", owner: "王店长", type: "黑名单", groupId: "g1", status: "自动排除", letter: "Q" },
-    { id: "c6", name: "孙玉轩", phone: "135 6001 9021", store: "五一直播覆盖门店", owner: "主播小李", type: "直播客户", groupId: "g2", status: "售后跟进", letter: "S" }
+    { id: "c1", name: "陈世敏", phone: "登录后可见", store: "南山门店", owner: "王店长", type: "白名单客户", groupId: "g1", status: "已入群", letter: "C" },
+    { id: "c2", name: "程婷婷", phone: "登录后可见", store: "南山门店", owner: "李店员", type: "白名单客户", groupId: "g1", status: "已入群", letter: "C" },
+    { id: "c3", name: "赵立民", phone: "登录后可见", store: "福田旗舰店", owner: "陈店长", type: "白名单客户", groupId: "g2", status: "已入群", letter: "Z" },
+    { id: "c4", name: "李杰", phone: "登录后可见", store: "宝安 A 店", owner: "许店长", type: "白名单客户", groupId: "g3", status: "已入群", letter: "L" },
+    { id: "c5", name: "钱韵澄", phone: "不可见", store: "南山门店", owner: "王店长", type: "黑名单", groupId: "g1", status: "不入群", letter: "Q" },
+    { id: "c6", name: "王店长", phone: "内部成员", store: "南山门店", owner: "华南代理", type: "群管", groupId: "g1", status: "可管理", letter: "W" }
   ];
 
   const tasks = [
-    { id: "t1", groupId: "g1", title: "南山门店客户群", desc: "新增客户 20 人，移除客户 3 人，新增店员 1 人", status: "待人工确认", tone: "amber" },
-    { id: "t2", groupId: "g2", title: "五一租赁专场直播群", desc: "直播覆盖门店新增 2 家，客户需补充进群", status: "分级同步", tone: "green" },
-    { id: "t3", groupId: "g3", title: "福田旗舰店客户群", desc: "原群主账号停用，需要重新指定群主", status: "待处理", tone: "amber" },
-    { id: "t4", groupId: "g4", title: "设备租赁使用课程群", desc: "黑名单客户已排除，低风险成员可自动同步", status: "已同步", tone: "gray" }
+    { id: "t1", customerId: "c1", title: "徐世敏", desc: "好久不见，加个微信，有空聚聚呀", status: "待确认", tone: "amber" },
+    { id: "t2", customerId: "c6", title: "王店长", desc: "南山门店群管身份已生效", status: "已添加", tone: "green" },
+    { id: "t3", customerId: "c5", title: "钱韵澄", desc: "该客户在黑名单内，不进入门店客户群", status: "不入群", tone: "red" }
   ];
 
   const state = {
     screen: "home",
-    role: "agent",
+    role: "staff",
     filter: "all",
     customerFilter: "all",
     query: "",
-    groupId: "g2",
+    groupId: "g1",
     customerId: "c1",
     history: [],
     plus: false,
@@ -133,17 +147,19 @@
     chatInput: "",
     toolsOpen: true,
     messages: [
-      { groupId: "g2", from: "主播小李", role: "群主", text: "今晚直播前，麻烦各门店把预约客户问题同步一下。", mine: false },
-      { groupId: "g2", from: "我", role: "代理", text: "南山门店新增客户已完成去重，待同步名单我来确认。", mine: true },
-      { groupId: "g2", from: "王店长", role: "店长", text: "售后问题我这边整理了设备使用答疑文档。", mine: false }
+      { groupId: "g1", from: "王店长", role: "群管", text: "今天新进白名单客户已经在群里了，黑名单客户不会展示。", mine: false },
+      { groupId: "g1", from: "我", role: "店员", text: "收到，我先在群里回复客户咨询。", mine: true },
+      { groupId: "g1", from: "华南代理", role: "群主", text: "南山门店有问题直接在这个群里沟通。", mine: false }
     ]
   };
 
   const currentRole = () => roles.find(item => item.id === state.role) || roles[0];
   const groupById = id => groups.find(item => item.id === id) || groups[0];
   const customerById = id => customers.find(item => item.id === id) || customers[0];
+  const visibleGroups = () => groups.filter(group => group.visible.includes(state.role));
+  const visibleCustomers = () => customers.filter(customer => visibleGroups().some(group => group.id === customer.groupId));
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
-  const toneFor = value => value === "待人工确认" || value === "待处理" || value.includes("分级同步") ? "amber" : value.includes("异常") || value.includes("黑名单") ? "red" : value.includes("直播") || value.includes("售中") ? "blue" : value.includes("课程") ? "violet" : value.includes("已") || value.includes("正常") || value.includes("售后") ? "green" : "gray";
+  const toneFor = value => value.includes("待") ? "amber" : value.includes("黑名单") || value.includes("不入群") ? "red" : value.includes("群管") || value.includes("加入") ? "blue" : value.includes("已") || value.includes("正常") || value.includes("白名单") ? "green" : "gray";
   const initials = value => escapeHtml(String(value).slice(0, 2));
 
   function statusBar() {
@@ -160,7 +176,9 @@
       home: "home",
       group: "group",
       customer: "customer",
-      mine: "mine"
+      mine: "mine",
+      discover: "group",
+      message: "customer"
     };
     return `<span class="db-nav-icon ${map[name] || ""}"></span>`;
   }
@@ -193,14 +211,14 @@
       <div class="db-head">
         <div class="db-title-row">
           <div class="db-top-tabs">
-            <button class="db-top-tab ${active === "home" ? "active" : ""}" data-route="home">工作台</button>
-            <button class="db-top-tab ${active === "groups" ? "active" : ""}" data-route="groups">群管理</button>
+            <button class="db-top-tab ${active === "messages" ? "active" : ""}" data-route="messages">消息</button>
+            <button class="db-top-tab ${active === "home" ? "active" : ""}" data-route="home">通讯录</button>
           </div>
           <button class="db-icon-btn db-right" data-action="togglePlus"><span class="db-plus"></span></button>
         </div>
         <div class="db-subtitle">${escapeHtml(role.name)}｜${escapeHtml(role.scope)}</div>
         <button class="db-search db-search-as-button" data-action="openSearch">
-          <span>⌕</span><span style="color:#b5bdc5;font-size:13px;">搜索群 / 客户 / 门店 / 课程</span>
+          <span>⌕</span><span style="color:#b5bdc5;font-size:13px;">搜索联系人 / 群聊 / 门店</span>
         </button>
       </div>
     `;
@@ -208,16 +226,16 @@
 
   function bottomNav(active) {
     const items = [
-      ["home", "首页", "home"],
-      ["groups", "群管理", "group"],
-      ["customers", "客户", "customer"],
-      ["profile", "我的", "mine"]
+      { screen: "learn", label: "学习", iconName: "home", action: "navToast" },
+      { screen: "discover", label: "发现", iconName: "discover", action: "navToast" },
+      { screen: "home", label: "消息", iconName: "message", routeName: "messages" },
+      { screen: "profile", label: "我的", iconName: "mine", routeName: "profile" }
     ];
     return `
       <nav class="db-bottom">
-        ${items.map(([screen, label, iconName]) => `
-          <button class="db-nav ${active === screen ? "active" : ""}" data-route="${screen}">
-            ${icon(iconName)}<span>${label}</span>
+        ${items.map(item => `
+          <button class="db-nav ${active === item.screen ? "active" : ""}" ${item.routeName ? `data-route="${item.routeName}"` : `data-action="${item.action}"`}>
+            ${icon(item.iconName)}<span>${item.label}</span>
           </button>
         `).join("")}
       </nav>
@@ -228,25 +246,26 @@
     if (!state.plus) return "";
     return `
       <div class="db-pop">
-        <button data-route="tasks">待处理任务</button>
-        <button data-action="openSync" data-group="g1">同步成员</button>
+        <button data-action="openSearch">添加客户</button>
+        <button data-route="tasks">新的朋友</button>
         <button data-action="roleSheet">切换身份</button>
       </div>
     `;
   }
 
   function homeScreen() {
-    const pendingTasks = tasks.filter(task => task.status !== "已同步").length;
+    const groupsForRole = visibleGroups();
+    const pendingTasks = tasks.filter(task => task.status === "待确认").length;
     return `
       <div class="db-page">
         ${statusBar()}
         ${mainHead("home")}
         <main class="db-scroll">
           <button class="db-entry" data-route="tasks">
-            ${avatar("待办", "green")}
+            ${avatar("朋友", "green")}
             <span class="db-entry-main">
-              <p class="db-entry-title">新的待处理</p>
-              <p class="db-entry-sub">成员同步、群主异常、黑名单处理</p>
+              <p class="db-entry-title">新的朋友</p>
+              <p class="db-entry-sub">好友申请、客户申请、群管身份提醒</p>
             </span>
             <span class="db-count">${pendingTasks}</span>
           </button>
@@ -254,16 +273,52 @@
             ${avatar("群聊", "blue")}
             <span class="db-entry-main">
               <p class="db-entry-title">我的群聊</p>
-              <p class="db-entry-sub">门店群、直播群、课程群、代理协同群</p>
+              <p class="db-entry-sub">按当前身份展示自动创建或已加入的群</p>
             </span>
           </button>
 
           <section class="db-section">
             <div class="db-section-title">常用群</div>
-            ${groups.slice(0, 4).map(groupEntry).join("")}
+            ${groupsForRole.slice(0, 4).map(groupEntry).join("")}
           </section>
         </main>
         <div class="db-alpha">A<br>B<br>C<br>D<br>F<br>H<br>K<br>M<br>N<br>S<br>Z<br>#</div>
+        ${bottomNav("home")}
+        ${plusMenu()}
+        ${toast()}
+      </div>
+    `;
+  }
+
+  function messagesScreen() {
+    const latestGroups = visibleGroups().slice(0, 3);
+    return `
+      <div class="db-page">
+        ${statusBar()}
+        ${mainHead("messages")}
+        <main class="db-scroll">
+          <section class="db-section">
+            <div class="db-section-title">站内消息</div>
+            <button class="db-entry" data-action="navToast">
+              ${avatar("通知", "green")}
+              <span class="db-entry-main">
+                <p class="db-entry-title">系统通知</p>
+                <p class="db-entry-sub">身份切换、群创建、群管变更等提醒</p>
+              </span>
+            </button>
+            <button class="db-entry" data-action="navToast">
+              ${avatar("客服", "blue")}
+              <span class="db-entry-main">
+                <p class="db-entry-title">客服消息</p>
+                <p class="db-entry-sub">订单咨询和服务提醒仍走原消息体系</p>
+              </span>
+            </button>
+          </section>
+          <section class="db-section">
+            <div class="db-section-title">最近群聊</div>
+            ${latestGroups.map(groupEntry).join("")}
+          </section>
+        </main>
         ${bottomNav("home")}
         ${plusMenu()}
         ${toast()}
@@ -278,14 +333,14 @@
   function groupEntry(group) {
     return `
       <button class="db-entry" data-action="openGroup" data-group="${group.id}">
-        ${avatar(group.name, group.filter === "live" ? "violet" : group.filter === "course" ? "blue" : group.filter === "store" ? "green" : "gray", true)}
+        ${avatar(group.name, group.filter === "joined" ? "blue" : group.filter === "managed" ? "violet" : "green", true)}
         <span class="db-entry-main">
           <p class="db-entry-title">${escapeHtml(group.name)}</p>
-          <p class="db-entry-sub">${escapeHtml(group.type)}｜来源：${escapeHtml(group.source)}｜群主：${escapeHtml(group.owner)}</p>
+          <p class="db-entry-sub">${escapeHtml(group.type)}｜${escapeHtml(group.source)}｜群主：${escapeHtml(group.owner)}</p>
           <span class="db-entry-meta">
-            ${badge(`客户 ${group.customers}`)}
-            ${badge(`待同步 ${group.pending}`, group.pending ? "amber" : "green")}
-            ${badge(group.stage, group.filter === "live" ? "violet" : group.filter === "course" ? "blue" : "")}
+            ${group.customers ? badge(`白名单 ${group.customers}`, "green") : badge("内部协同", "violet")}
+            ${group.excluded ? badge(`黑名单排除 ${group.excluded}`, "red") : ""}
+            ${badge(group.stage, group.filter === "joined" ? "blue" : "")}
           </span>
         </span>
       </button>
@@ -293,12 +348,12 @@
   }
 
   function groupsScreen() {
-    const tabs = [["all", "全部"], ["mine", "我的群"], ["store", "门店群"], ["live", "直播群"], ["course", "课程群"]];
-    const list = groups.filter(group => state.filter === "all" || group.filter === state.filter || (state.filter === "mine" && group.id === "g5"));
+    const tabs = [["all", "全部"], ["store", "门店群"], ["managed", "我管理"], ["joined", "我加入"]];
+    const list = visibleGroups().filter(group => state.filter === "all" || group.filter === state.filter || (state.filter === "managed" && ["store", "managed"].includes(group.filter)));
     return `
       <div class="db-page db-soft">
         ${statusBar()}
-        ${mainHead("groups")}
+        ${mainHead("home")}
         <main class="db-scroll">
           <div class="db-filter">
             ${tabs.map(([id, label]) => `<button class="${state.filter === id ? "active" : ""}" data-action="filter" data-filter="${id}">${label}</button>`).join("")}
@@ -308,7 +363,7 @@
             ${list.map(groupCard).join("")}
           </section>
         </main>
-        ${bottomNav("groups")}
+        ${bottomNav("home")}
         ${plusMenu()}
         ${toast()}
       </div>
@@ -321,38 +376,38 @@
         <button class="db-entry" data-action="openGroup" data-group="${group.id}" style="min-height:auto;">
           <span class="db-entry-main">
             <p class="db-entry-title">${escapeHtml(group.name)}</p>
-            <p class="db-entry-sub">${escapeHtml(group.type)}｜来源：${escapeHtml(group.source)}<br>群主：${escapeHtml(group.owner)}</p>
+            <p class="db-entry-sub">${escapeHtml(group.type)}｜来源：${escapeHtml(group.source)}<br>群主：${escapeHtml(group.owner)}｜群管：${escapeHtml(group.managers)}</p>
             <span class="db-entry-meta">
-              ${badge(`客户 ${group.customers}`)}
-              ${badge(`内部成员 ${group.internal}`)}
+              ${group.customers ? badge(`白名单 ${group.customers}`, "green") : badge("无客户成员", "gray")}
+              ${badge(`群管 ${group.internal}`, "blue")}
+              ${group.excluded ? badge(`黑名单排除 ${group.excluded}`, "red") : ""}
               ${badge(group.status, group.tone)}
-              ${group.filter === "live" ? badge("售前｜售中｜售后", "violet") : ""}
             </span>
           </span>
         </button>
         <div class="db-actions">
           <button class="db-action" data-action="openGroup" data-group="${group.id}">群详情</button>
           <button class="db-action" data-action="openChat" data-group="${group.id}">群聊</button>
-          <button class="db-action" data-action="sourceToast" data-group="${group.id}">查看来源</button>
-          <button class="db-secondary" style="height:40px;font-size:13px;" data-action="openSync" data-group="${group.id}">同步成员</button>
+          <button class="db-action" data-action="sourceToast" data-group="${group.id}">创建规则</button>
+          <button class="db-secondary" style="height:40px;font-size:13px;" data-action="openSettings" data-group="${group.id}">群设置</button>
         </div>
       </article>
     `;
   }
 
   function customersScreen() {
-    const tabs = [["all", "全部"], ["门店客户", "门店客户"], ["直播客户", "直播客户"], ["课程客户", "课程客户"], ["待移出", "待移出"]];
-    const list = customers.filter(item => state.customerFilter === "all" || item.type === state.customerFilter);
+    const tabs = [["all", "全部"], ["白名单客户", "白名单"], ["群管", "群管"], ["黑名单", "黑名单"]];
+    const list = visibleCustomers().filter(item => state.customerFilter === "all" || item.type === state.customerFilter);
     return `
       <div class="db-page">
         ${statusBar()}
         <div class="db-head">
           <div class="db-title-row">
-            <h1 class="db-title">客户通讯录</h1>
+            <h1 class="db-title">通讯录</h1>
             <button class="db-icon-btn db-right" data-action="togglePlus"><span class="db-plus"></span></button>
           </div>
           <button class="db-search db-search-as-button" data-action="openSearch">
-            <span>⌕</span><span style="color:#b5bdc5;font-size:13px;">搜索客户 / 手机号 / 门店</span>
+            <span>⌕</span><span style="color:#b5bdc5;font-size:13px;">搜索客户 / 门店 / 群聊</span>
           </button>
         </div>
         <main class="db-scroll">
@@ -365,7 +420,7 @@
           </section>
         </main>
         <div class="db-alpha">A<br>B<br>C<br>D<br>E<br>F<br>G<br>H<br>J<br>L<br>Q<br>S<br>Z<br>#</div>
-        ${bottomNav("customers")}
+        ${bottomNav("home")}
         ${plusMenu()}
         ${toast()}
       </div>
@@ -375,7 +430,7 @@
   function customerEntry(customer) {
     return `
       <button class="db-entry" data-action="openCustomer" data-customer="${customer.id}">
-        ${avatar(customer.name, customer.type === "黑名单" ? "red" : customer.type === "直播客户" ? "violet" : customer.type === "课程客户" ? "blue" : "amber")}
+        ${avatar(customer.name, customer.type === "黑名单" ? "red" : customer.type === "群管" ? "blue" : "green")}
         <span class="db-entry-main">
           <p class="db-entry-title">${escapeHtml(customer.name)}</p>
           <p class="db-entry-sub">${escapeHtml(customer.store)}｜服务人：${escapeHtml(customer.owner)}</p>
@@ -388,8 +443,8 @@
   function searchScreen() {
     const q = state.query.trim();
     const hasQuery = q.length > 0;
-    const groupResults = hasQuery ? groups.filter(item => [item.name, item.type, item.source, item.owner].join("").includes(q)) : [];
-    const customerResults = hasQuery ? customers.filter(item => [item.name, item.phone, item.store, item.type].join("").includes(q)) : [];
+    const groupResults = hasQuery ? visibleGroups().filter(item => [item.name, item.type, item.source, item.owner].join("").includes(q)) : [];
+    const customerResults = hasQuery ? visibleCustomers().filter(item => [item.name, item.store, item.type].join("").includes(q)) : [];
     const empty = hasQuery && !groupResults.length && !customerResults.length;
     return `
       <div class="db-page">
@@ -405,7 +460,7 @@
           </div>
         </div>
         <main class="db-scroll no-nav">
-          ${!hasQuery ? "" : empty ? emptyState("未搜索到群或客户") : `
+          ${!hasQuery ? "" : empty ? emptyState("未搜索到联系人或群聊") : `
             ${customerResults.length ? `<section class="db-section"><div class="db-section-title">联系人</div>${customerResults.slice(0, 3).map(customerEntry).join("")}</section>` : ""}
             ${groupResults.length ? `<section class="db-section"><div class="db-section-title">群聊</div>${groupResults.slice(0, 4).map(groupEntry).join("")}</section>` : ""}
           `}
@@ -428,7 +483,7 @@
         <main class="db-scroll no-nav">
           <section class="db-detail-hero">
             <div class="db-detail-person">
-              ${avatar(group.name, group.filter === "live" ? "violet" : group.filter === "course" ? "blue" : "green")}
+              ${avatar(group.name, group.filter === "joined" ? "blue" : group.filter === "managed" ? "violet" : "green")}
               <div>
                 <h2 class="db-detail-name">${escapeHtml(group.name)}</h2>
                 <p class="db-detail-text">${escapeHtml(group.type)}｜${escapeHtml(group.source)}<br>群主：${escapeHtml(group.owner)}</p>
@@ -441,27 +496,17 @@
           </section>
           <section class="db-section">
             <div class="db-info-list">
-              ${infoRow("客户数", `${group.customers} 位`)}
-              ${infoRow("内部成员", `${group.internal} 位`)}
-              ${infoRow("待同步成员", `${group.pending} 位`)}
-              ${infoRow("最近同步", group.latest)}
-              ${infoRow("来源对象", group.source)}
-              ${infoRow("同步策略", group.pending ? "分级同步：低风险自动，高风险确认" : "已自动同步")}
+              ${infoRow("白名单客户", `${group.customers} 位`)}
+              ${infoRow("群管", group.managers)}
+              ${infoRow("黑名单排除", `${group.excluded} 位`)}
+              ${infoRow("创建规则", group.filter === "store" ? "切换门店/代理身份后自动创建" : "按当前身份可见")}
+              ${infoRow("最近消息", group.latest)}
+              ${infoRow("手机号展示", "客户登录或授权前不可见")}
             </div>
           </section>
-          ${group.filter === "live" ? `
-            <section class="db-section">
-              <div class="db-section-title">直播服务链路</div>
-              <div class="db-info-list">
-                ${infoRow("售前咨询", "开播提醒、预约客户承接、商品资料预热")}
-                ${infoRow("售中互动", "直播问答、商品答疑、下单问题处理")}
-                ${infoRow("售后跟进", "订单跟进、设备使用指导、售后回访")}
-              </div>
-            </section>
-          ` : ""}
           <section class="db-section">
             <div class="db-actions">
-              <button class="db-primary" data-action="openSync" data-group="${group.id}">同步成员</button>
+              <button class="db-primary" data-action="openChat" data-group="${group.id}">进入群聊</button>
               <button class="db-secondary" data-action="sourceToast">查看来源</button>
             </div>
           </section>
@@ -482,10 +527,10 @@
         <main class="db-scroll no-nav">
           <section class="db-detail-hero">
             <div class="db-detail-person">
-              ${avatar(customer.name, customer.type === "黑名单" ? "red" : "green")}
+              ${avatar(customer.name, customer.type === "黑名单" ? "red" : customer.type === "群管" ? "blue" : "green")}
               <div>
                 <h2 class="db-detail-name">${escapeHtml(customer.name)}</h2>
-              <p class="db-detail-text">所属门店：${escapeHtml(customer.store)}<br>电话：${escapeHtml(customer.phone)}</p>
+              <p class="db-detail-text">所属门店：${escapeHtml(customer.store)}<br>手机号：${escapeHtml(customer.phone)}</p>
               </div>
             </div>
             <div class="db-actions" style="padding:0 18px;">
@@ -498,7 +543,7 @@
               ${infoRow("所属门店", customer.store)}
               ${infoRow("服务人", customer.owner)}
               ${infoRow("客户类型", customer.type)}
-              ${infoRow("同步状态", customer.status)}
+              ${infoRow("入群状态", customer.status)}
               ${infoRow("所在群", group.name)}
             </div>
           </section>
@@ -513,22 +558,21 @@
     return `
       <div class="db-page">
         ${statusBar()}
-        ${titleHead("新的待处理", { back: true, right: `<button class="db-icon-btn db-right" data-action="openSearch" style="color:#22c7a5;font-size:13px;font-weight:800;width:auto;">搜索</button>` })}
+        ${titleHead("新的朋友", { back: true, right: `<button class="db-icon-btn db-right" data-action="openSearch" style="color:#22c7a5;font-size:13px;font-weight:800;width:auto;">添加客户</button>` })}
         <main class="db-scroll no-nav">
           ${visible.length ? visible.map(task => {
-            const group = groupById(task.groupId);
-            const done = state.synced[group.id] || task.status === "已同步";
+            const customer = customerById(task.customerId);
             return `
-              <button class="db-entry" data-action="openSync" data-group="${group.id}">
-                ${avatar(group.name, done ? "gray" : task.tone)}
+              <button class="db-entry" data-action="openCustomer" data-customer="${customer.id}">
+                ${avatar(customer.name, task.tone)}
                 <span class="db-entry-main">
                   <p class="db-entry-title">${escapeHtml(task.title)}</p>
                   <p class="db-entry-sub">${escapeHtml(task.desc)}</p>
                 </span>
-                ${badge(done ? "已同步" : task.status, done ? "green" : task.tone)}
+                ${badge(task.status, task.tone)}
               </button>
             `;
-          }).join("") : emptyState("暂无新的待处理")}
+          }).join("") : emptyState("暂无新的朋友")}
         </main>
         ${toast()}
       </div>
@@ -537,43 +581,34 @@
 
   function syncScreen() {
     const group = groupById(state.groupId);
-    const done = state.synced[group.id];
     return `
       <div class="db-page db-soft">
         ${statusBar()}
-        ${titleHead("成员同步确认", { back: true })}
+        ${titleHead("群创建规则", { back: true })}
         <main class="db-scroll no-nav">
           <section class="db-detail-hero">
             <div class="db-detail-person">
-              ${avatar(group.name, group.filter === "live" ? "violet" : group.filter === "course" ? "blue" : "green")}
+              ${avatar(group.name, "green")}
               <div>
                 <h2 class="db-detail-name">${escapeHtml(group.name)}</h2>
-                <p class="db-detail-text">${escapeHtml(group.source)}<br>待同步：${group.pending} 位</p>
+                <p class="db-detail-text">${escapeHtml(group.source)}<br>${escapeHtml(group.summary)}</p>
               </div>
             </div>
           </section>
           <section class="db-section">
-            <div class="db-section-title">差异内容</div>
+            <div class="db-section-title">规则说明</div>
             <div class="db-card">
-              <p class="db-entry-title" style="font-size:14px;">${escapeHtml(group.summary)}</p>
-              <p class="db-entry-sub">低风险：新客户加入、重复客户去重、黑名单不加入。高风险：客户移出、客户转移、群主异常、人数阈值。</p>
+              <p class="db-entry-title" style="font-size:14px;">按身份和门店关系自动展示</p>
+              <p class="db-entry-sub">普通客户只看自己加入的群；店员、店长只看当前门店客户群；代理可看自己邀请门店下的客户群。白名单客户进入群聊，黑名单客户不展示。</p>
               <div class="db-entry-meta">
-                ${badge("自动同步 12", "green")}
-                ${badge("人工确认 5", "amber")}
-                ${group.filter === "live" ? badge("售前｜售中｜售后", "violet") : ""}
+                ${badge("自动创建", "green")}
+                ${badge("黑名单排除", "red")}
+                ${badge("按身份可见", "blue")}
               </div>
             </div>
           </section>
-          ${done ? `<div class="db-toast" style="position:static;transform:none;margin:14px auto 0;">已发送同步申请</div>` : ""}
           <section class="db-section">
-            ${done ? `
-              <button class="db-primary" style="width:100%;" data-action="openGroup" data-group="${group.id}">返回群详情</button>
-              <button class="db-secondary" style="width:100%;margin-top:12px;" data-route="tasks">查看待处理</button>
-            ` : `
-              <button class="db-primary" style="width:100%;" data-action="confirmSync" data-group="${group.id}">确认同步</button>
-              <button class="db-secondary" style="width:100%;margin-top:12px;" data-action="escalateSync">提交上级处理</button>
-              <button class="db-danger" style="width:100%;margin-top:12px;" data-action="rejectSync">拒绝本次变更</button>
-            `}
+            <button class="db-primary" style="width:100%;" data-action="openGroup" data-group="${group.id}">返回群详情</button>
           </section>
         </main>
         ${toast()}
@@ -604,14 +639,13 @@
   function chatScreen() {
     const group = groupById(state.groupId);
     const list = state.messages.filter(item => item.groupId === group.id);
-    const messages = list.length ? list : [{ groupId: group.id, from: "系统", role: "同步助手", text: `${group.name}暂无群消息，成员同步后可直接承接客户触达。`, mine: false, system: true }];
+    const messages = list.length ? list : [{ groupId: group.id, from: "系统", role: "通讯录助手", text: `${group.name}暂无群消息，群成员会按当前身份和门店关系自动展示。`, mine: false, system: true }];
     return `
       <div class="db-page db-chat-body">
         ${statusBar()}
         ${titleHead(group.name, { back: true, more: "openSettings" })}
         <main class="db-scroll with-composer">
           <div class="db-chat-day">2026-05-09 09:41</div>
-          ${group.filter === "live" ? `<div class="db-stage-bar">${badge("售前", "green")}${badge("售中", "blue")}${badge("售后", "violet")}</div>` : ""}
           ${messages.map(messageView).join("")}
           <button class="db-material" data-action="toolMessage" data-type="素材库">素材库</button>
         </main>
@@ -626,7 +660,7 @@
             ${toolButton("照片", "□")}
             ${toolButton("文件", "▤")}
             ${toolButton("语音", "≋")}
-            ${toolButton("直播", "▷")}
+            ${toolButton("相机", "◉")}
             ${toolButton("语音通话", "☎")}
             ${toolButton("视频通话", "▣")}
           </div>
@@ -679,10 +713,10 @@
           </section>
           <section class="db-section">
             <div class="db-info-list">
-              ${infoRow("查看群", "是")}
-              ${infoRow("查看客户", "是")}
-              ${infoRow("同步成员", role.id === "agent" ? "是" : "按角色权限")}
-              ${infoRow("推送商品 / 优惠券", "V1.1 预留")}
+              ${infoRow("可见群聊", role.id === "buyer" ? "已加入群聊" : "当前身份关联群")}
+              ${infoRow("客户范围", role.id === "buyer" ? "不展示门店客户" : "门店白名单客户")}
+              ${infoRow("群权限", role.id === "agent" ? "群主" : ["staff", "manager"].includes(role.id) ? "群管" : "无")}
+              ${infoRow("当前方案", "消息侧通讯录与群聊")}
             </div>
           </section>
         </main>
@@ -724,7 +758,7 @@
         <div class="db-sheet-mask">
           <div class="db-sheet">
             <div class="db-sheet-title">请再次确认是否停用该群</div>
-            <p class="db-entry-sub" style="text-align:center;">停用后将不再进行成员同步，但保留历史聊天和同步记录。</p>
+            <p class="db-entry-sub" style="text-align:center;">停用后不再展示在通讯录中，但保留历史聊天记录。</p>
             <div class="db-actions">
               <button class="db-secondary" data-action="closeSheet">取消</button>
               <button class="db-danger" data-action="disableGroup">确认</button>
@@ -737,7 +771,7 @@
       return `
         <div class="db-sheet-mask">
           <div class="db-sheet">
-            <div class="db-sheet-title">切换业务身份</div>
+            <div class="db-sheet-title">切换身份</div>
             <div class="db-info-list">
               ${roles.map(item => `<button class="db-info-row" data-action="setRole" data-role="${item.id}"><span>${escapeHtml(item.name)}</span><span>${item.id === state.role ? "当前" : "切换"} ›</span></button>`).join("")}
             </div>
@@ -755,6 +789,7 @@
 
   function render() {
     const screen = {
+      messages: messagesScreen,
       home: homeScreen,
       groups: groupsScreen,
       customers: customersScreen,
@@ -837,7 +872,7 @@
     if (!el) return;
     const routeName = el.dataset.route;
     if (routeName) {
-      route(routeName, { reset: ["home", "groups", "customers", "profile"].includes(routeName) });
+      route(routeName, { reset: ["messages", "home", "groups", "customers", "profile"].includes(routeName) });
       return;
     }
     const action = el.dataset.action;
@@ -851,10 +886,19 @@
     if (action === "openCustomer") { route("customerDetail", { customerId: el.dataset.customer }); return; }
     if (action === "openChat") { route("chat", { groupId: el.dataset.group || state.groupId }); return; }
     if (action === "openSync") { route("sync", { groupId: el.dataset.group || state.groupId }); return; }
-    if (action === "openSettings") { route("settings", { groupId: state.groupId }); return; }
-    if (action === "sourceToast") { showToast("来源对象已在后台规则中自动识别"); return; }
+    if (action === "openSettings") { route("settings", { groupId: el.dataset.group || state.groupId }); return; }
+    if (action === "sourceToast") { showToast("群聊由身份、门店和白名单关系自动生成"); return; }
     if (action === "roleSheet") { state.plus = false; state.sheet = "role"; render(); return; }
-    if (action === "setRole") { state.role = el.dataset.role || state.role; state.sheet = null; showToast("身份已切换"); return; }
+    if (action === "setRole") {
+      state.role = el.dataset.role || state.role;
+      state.groupId = visibleGroups()[0]?.id || state.groupId;
+      state.filter = "all";
+      state.customerFilter = "all";
+      state.sheet = null;
+      showToast("身份已切换");
+      return;
+    }
+    if (action === "navToast") { showToast("当前先聚焦消息侧通讯录"); return; }
     if (action === "callSheet") { state.sheet = "call"; render(); return; }
     if (action === "remarkSheet") { state.sheet = "remark"; render(); return; }
     if (action === "disableSheet") { state.sheet = "disable"; render(); return; }
@@ -874,7 +918,7 @@
     if (action === "confirmSync") {
       const group = groupById(el.dataset.group || state.groupId);
       state.synced[group.id] = true;
-      showToast("已发送同步申请");
+      showToast("已确认");
       return;
     }
     if (action === "escalateSync") { showToast("已提交上级处理"); return; }
@@ -883,20 +927,20 @@
       const input = document.getElementById("dbChatInput");
       const text = (input?.value || state.chatInput || "").trim();
       if (!text) { showToast("请输入消息内容"); return; }
-      state.messages.push({ groupId: state.groupId, from: "我", role: "代理", text, mine: true });
+      state.messages.push({ groupId: state.groupId, from: "我", role: currentRole().name, text, mine: true });
       state.chatInput = "";
       render();
       return;
     }
     if (action === "toggleTools") { state.toolsOpen = !state.toolsOpen; render(); return; }
     if (action === "voiceMessage") {
-      state.messages.push({ groupId: state.groupId, from: "我", role: "代理", text: "语音消息 12 秒", mine: true });
+      state.messages.push({ groupId: state.groupId, from: "我", role: currentRole().name, text: "语音消息 12 秒", mine: true });
       render();
       return;
     }
     if (action === "toolMessage") {
       const type = el.dataset.type || "附件";
-      state.messages.push({ groupId: state.groupId, from: "我", role: "代理", text: `${type}已发送`, mine: true });
+      state.messages.push({ groupId: state.groupId, from: "我", role: currentRole().name, text: `${type}已发送`, mine: true });
       render();
     }
   });
