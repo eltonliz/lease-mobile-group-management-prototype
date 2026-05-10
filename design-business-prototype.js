@@ -609,8 +609,10 @@
   function makeAnnotationDraggable(tooltip) {
     if (tooltip.dataset.dragReady) return;
     tooltip.dataset.dragReady = "true";
+    const handle = tooltip.querySelector(".prd-anno-head");
+    if (!handle) return;
     let drag = null;
-    tooltip.addEventListener("mousedown", event => {
+    handle.addEventListener("mousedown", event => {
       if (event.target.closest(".prd-anno-close")) return;
       event.preventDefault();
       event.stopPropagation();

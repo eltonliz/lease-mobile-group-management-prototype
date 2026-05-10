@@ -1024,6 +1024,7 @@ body.design-business-body {
   box-shadow: 0 16px 42px rgba(15, 23, 42, .22);
   color: #27313d;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  user-select: text;
 }
 
 .prd-anno-head {
@@ -1071,6 +1072,8 @@ body.design-business-body {
   padding: 12px;
   font-size: 13px;
   line-height: 1.6;
+  cursor: text;
+  user-select: text;
 }
 
 .prd-anno-body p {
