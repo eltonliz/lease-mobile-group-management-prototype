@@ -13,16 +13,17 @@
       type: "门店群",
       source: "南山门店",
       tenant: "租户 A",
-      owner: "王店长",
-      ownerRole: "店长",
+      owner: "南山代理",
+      ownerRole: "代理",
       ownerStatus: "正常",
-      managers: "李店员",
+      managers: "王店长、李店员",
       managersList: [
+        { name: "王店长", role: "店长", store: "南山门店", status: "正常" },
         { name: "李店员", role: "店员", store: "南山门店", status: "正常" }
       ],
       customers: 221,
-      members: 223,
-      internal: 2,
+      members: 224,
+      internal: 3,
       excluded: 9,
       pending: 0,
       status: "已自动创建",
@@ -30,7 +31,7 @@
       filter: "store",
       visible: ["staff", "manager"],
       letter: "N",
-      summary: "切换到南山门店店员或店长身份后自动可见；白名单客户入群，黑名单客户不入群。",
+      summary: "切换到南山门店店员或店长身份后自动可见；代理为群主，店长和店员为群管。",
       stage: "白名单客户群",
       created: "2026-05-08 10:00",
       abnormal: 0,
@@ -162,7 +163,8 @@
     { id: "c3", name: "赵立民", phone: "136****2910", store: "福田旗舰店", owner: "陈店长", type: "白名单客户", groupId: "g2", status: "正常", letter: "Z", joinedAt: "05-07 18:02" },
     { id: "c4", name: "李杰", phone: "C0003", store: "宝安 A 店", owner: "许店长", type: "白名单客户", groupId: "g3", status: "正常", letter: "L", joinedAt: "05-08 16:30" },
     { id: "c5", name: "钱韵澄", phone: "不可见", store: "南山门店", owner: "王店长", type: "黑名单", groupId: "g1", status: "不入群", letter: "Q" },
-    { id: "c6", name: "李店员", phone: "内部成员", store: "南山门店", owner: "王店长", type: "群管", groupId: "g1", status: "可管理", letter: "L" }
+    { id: "c6", name: "王店长", phone: "内部成员", store: "南山门店", owner: "南山代理", type: "群管", groupId: "g1", status: "可管理", letter: "W" },
+    { id: "c7", name: "李店员", phone: "内部成员", store: "南山门店", owner: "王店长", type: "群管", groupId: "g1", status: "可管理", letter: "L" }
   ];
 
   const friends = [
@@ -206,7 +208,7 @@
     messages: [
       { groupId: "g1", from: "王店长", role: "群管", text: "今天新进白名单客户已经在群里了，黑名单客户不会展示。", mine: false },
       { groupId: "g1", from: "我", role: "店员", text: "收到，我先在群里回复客户咨询。", mine: true },
-      { groupId: "g1", from: "王店长", role: "群主", text: "南山门店有问题直接在这个群里沟通。", mine: false }
+      { groupId: "g1", from: "南山代理", role: "群主", text: "南山门店有问题直接在这个群里沟通。", mine: false }
     ]
   };
 
@@ -281,7 +283,7 @@
 - 群名称：门店群聊名称。
 - 群类型：门店群 / 代理群 / 普通群聊。
 - 来源门店：群对应门店。
-- 群主：代理 / 店长。
+- 群主：代理。代理永远是门店客户群的最高层级，只要门店存在代理归属，群主固定为代理。
 - 群管：店长、店员。
 - 客户数：白名单客户数量。
 - 群状态：正常 / 异常 / 已自动创建。
@@ -336,7 +338,7 @@
       title: "群成员、白名单与黑名单",
       md: `
 **成员概览：**
-- 群主：代理 / 店长。
+- 群主：代理。代理永远是最高层级，不因店员 / 店长视角变化而改成店长。
 - 群管：店长、店员。
 - 客户人数：白名单客户数量。
 - 黑名单客户：不进入群，不在成员列表展示。
@@ -344,7 +346,7 @@
 
 **群主字段：**
 - 姓名 / 昵称。
-- 身份：代理 / 店长。
+- 身份：代理。
 - 所属门店：如适用。
 - 状态：正常 / 停用。
 
@@ -437,8 +439,8 @@
 **本期支持身份：**
 - 普通买家：支持基础状态，默认不展示管理群。
 - 店员：展示当前门店群。
-- 店长：展示当前门店群，可作为群主或群管。
-- 代理：展示其拓展 / 邀请 / 管理的门店群。
+- 店长：展示当前门店群，作为群管参与门店客户群。
+- 代理：展示其拓展 / 邀请 / 管理的门店群，代理永远是最高层级和群主。
 
 **操作权限：**
 - 进入通讯录：普通买家、店员、店长、代理均可。
