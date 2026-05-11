@@ -1,9 +1,9 @@
 (() => {
   const roles = [
-    { id: "buyer", name: "普通客户", scope: "个人身份", tenant: "租户 C", desc: "可使用好友、聊天能力，不展示管理型门店群" },
-    { id: "staff", name: "南山店员", scope: "南山门店", tenant: "租户 A", desc: "切换到店员身份后，可查看本门店自动创建的客户群" },
-    { id: "manager", name: "南山店长", scope: "南山门店", tenant: "租户 A", desc: "作为门店群群管，维护本店白名单客户与群内沟通" },
-    { id: "agent", name: "华南代理", scope: "A / B / C 门店", tenant: "租户 B", desc: "代理邀请的门店会自动生成门店客户群，代理为群主" }
+    { id: "buyer", name: "普通客户", scope: "订单门店", tenant: "租户 C", desc: "下单成功后，按订单所属门店进入对应门店服务群" },
+    { id: "staff", name: "南山店员", scope: "南山 / 前海门店", tenant: "租户 A", desc: "可查看当前身份下所在多个门店群，不同组织身份不混合展示" },
+    { id: "manager", name: "南山店长", scope: "南山门店", tenant: "租户 A", desc: "店长只负责一个门店，作为门店群群管参与服务" },
+    { id: "agent", name: "华南代理", scope: "招募渠道门店", tenant: "租户 B", desc: "来自招募渠道组织，查看该组织招募 / 关联门店群，代理为群主" }
   ];
 
   const groups = [
@@ -38,6 +38,36 @@
       latest: "今天 10:20"
     },
     {
+      id: "g6",
+      name: "前海门店客户群",
+      type: "门店群",
+      source: "前海门店",
+      tenant: "租户 A",
+      owner: "前海代理",
+      ownerRole: "代理",
+      ownerStatus: "正常",
+      managers: "刘店长、何店员",
+      managersList: [
+        { name: "刘店长", role: "店长", store: "前海门店", status: "正常" },
+        { name: "何店员", role: "店员", store: "前海门店", status: "正常" }
+      ],
+      customers: 96,
+      members: 99,
+      internal: 3,
+      excluded: 3,
+      pending: 1,
+      status: "已自动创建",
+      tone: "green",
+      filter: "store",
+      visible: ["staff"],
+      letter: "Q",
+      summary: "店员可同时属于同一组织身份下多个门店，当前身份下展示南山、前海等可服务门店群。",
+      stage: "白名单客户群",
+      created: "2026-05-09 14:30",
+      abnormal: 0,
+      latest: "今天 09:28"
+    },
+    {
       id: "g2",
       name: "福田旗舰店客户群",
       type: "门店群",
@@ -60,7 +90,7 @@
       filter: "store",
       visible: ["agent"],
       letter: "F",
-      summary: "代理身份下自动生成的门店群；店长为群管，客户来自该门店白名单。",
+      summary: "代理来自招募渠道组织，门店群按该组织招募 / 关联门店自动生成；代理永远是群主。",
       stage: "白名单客户群",
       created: "2026-05-06 18:20",
       abnormal: 1,
@@ -90,7 +120,7 @@
       filter: "store",
       visible: ["agent"],
       letter: "B",
-      summary: "代理拓展门店后生成客户群，群主为代理，店长和店员为群管。",
+      summary: "代理来自招募渠道组织，门店群按该组织招募 / 关联门店自动生成；群主为代理，店长和店员为群管。",
       stage: "白名单客户群",
       created: "2026-05-07 16:30",
       abnormal: 0,
@@ -98,30 +128,31 @@
     },
     {
       id: "g4",
-      name: "我的租赁咨询群",
-      type: "普通群聊",
-      source: "客户主动加入",
+      name: "天河数码门店服务群",
+      type: "门店群",
+      source: "天河数码门店",
       tenant: "租户 C",
-      owner: "系统客服",
-      ownerRole: "客服",
+      owner: "天河代理",
+      ownerRole: "代理",
       ownerStatus: "正常",
-      managers: "客服助手",
+      managers: "周店长、黄店员",
       managersList: [
-        { name: "客服助手", role: "客服", store: "平台", status: "正常" }
+        { name: "周店长", role: "店长", store: "天河数码门店", status: "正常" },
+        { name: "黄店员", role: "店员", store: "天河数码门店", status: "正常" }
       ],
-      customers: 12,
-      members: 13,
-      internal: 1,
-      excluded: 0,
-      pending: 0,
-      status: "已加入",
-      tone: "blue",
-      filter: "joined",
-      visible: ["buyer", "staff", "manager", "agent"],
-      letter: "W",
-      summary: "普通客户身份下可查看自己已加入的群聊。",
-      stage: "我加入的群",
-      created: "2026-05-09 09:00",
+      customers: 42,
+      members: 45,
+      internal: 3,
+      excluded: 2,
+      pending: 1,
+      status: "下单后已加入",
+      tone: "green",
+      filter: "order",
+      visible: ["buyer"],
+      letter: "T",
+      summary: "买家下单成功后，根据订单所属门店自动创建或复用门店群，并将有效客户加入真实 IM 群。",
+      stage: "订单门店群",
+      created: "2026-05-10 09:00",
       abnormal: 0,
       latest: "今天 09:45"
     },
@@ -149,7 +180,7 @@
       filter: "managed",
       visible: ["agent"],
       letter: "H",
-      summary: "代理与门店的内部协同群，无客户成员。",
+      summary: "代理招募渠道组织内的门店协同群，无客户成员，用于代理侧内部沟通。",
       stage: "内部协同",
       created: "2026-05-07 20:12",
       abnormal: 0,
@@ -164,7 +195,10 @@
     { id: "c4", name: "李杰", phone: "C0003", store: "宝安 A 店", owner: "许店长", type: "白名单客户", groupId: "g3", status: "正常", letter: "L", joinedAt: "05-08 16:30" },
     { id: "c5", name: "钱韵澄", phone: "不可见", store: "南山门店", owner: "王店长", type: "黑名单", groupId: "g1", status: "不入群", letter: "Q" },
     { id: "c6", name: "王店长", phone: "内部成员", store: "南山门店", owner: "南山代理", type: "群管", groupId: "g1", status: "可管理", letter: "W" },
-    { id: "c7", name: "李店员", phone: "内部成员", store: "南山门店", owner: "王店长", type: "群管", groupId: "g1", status: "可管理", letter: "L" }
+    { id: "c7", name: "李店员", phone: "内部成员", store: "南山门店", owner: "王店长", type: "群管", groupId: "g1", status: "可管理", letter: "L" },
+    { id: "c8", name: "徐世敏", phone: "130****8577", store: "天河数码门店", owner: "周店长", type: "白名单客户", groupId: "g4", status: "订单客户", letter: "X", joinedAt: "05-10 09:45" },
+    { id: "c9", name: "林小北", phone: "137****3208", store: "前海门店", owner: "何店员", type: "白名单客户", groupId: "g6", status: "正常", letter: "L", joinedAt: "05-09 15:06" },
+    { id: "c10", name: "刘店长", phone: "内部成员", store: "前海门店", owner: "前海代理", type: "群管", groupId: "g6", status: "可管理", letter: "L" }
   ];
 
   const friends = [
@@ -208,7 +242,9 @@
     messages: [
       { groupId: "g1", from: "王店长", role: "群管", text: "今天新进白名单客户已经在群里了，黑名单客户不会展示。", mine: false },
       { groupId: "g1", from: "我", role: "店员", text: "收到，我先在群里回复客户咨询。", mine: true },
-      { groupId: "g1", from: "南山代理", role: "群主", text: "南山门店有问题直接在这个群里沟通。", mine: false }
+      { groupId: "g1", from: "南山代理", role: "群主", text: "南山门店有问题直接在这个群里沟通。", mine: false },
+      { groupId: "g4", from: "周店长", role: "群管", text: "你的订单已经归属天河数码门店，有商品、订单问题可以直接在群里问。", mine: false },
+      { groupId: "g4", from: "我", role: "普通客户", text: "好的，我想咨询一下订单配送时间。", mine: true }
     ]
   };
 
@@ -227,13 +263,15 @@
 - 返回通讯录外层时应回到消息页。
 
 **业务定义：**
-- 本期通讯录是 APP 消息模块内的轻量入口，核心目标是根据当前登录用户身份展示对应门店群 / 代理门店群。
-- 通讯录不是新的群管理系统；后台配置、完整群成员管理、直播群、课程 / 录播群、主播端均不进入 V1.0。
+- 本期通讯录是 APP 消息模块内的轻量入口，核心对象是「门店群」。
+- 买家通过成功订单归属门店进入门店群；店员 / 店长通过门店身份进入门店群；代理通过「招募渠道」组织关联门店进入门店群。
+- 本期不按直播间、课程、主播场次建群；直播后续只作为 IM 消息体或运营内容推送，不作为 V1.0 建群对象。
+- 通讯录不是新的群管理系统；后台配置、复杂群成员管理、直播群、课程 / 录播群、主播端均不进入 V1.0。
 
 **接口与埋点：**
 - 进入消息页记录 view_message_page。
 - 点击通讯录记录 click_address_book。
-- 点击后读取当前身份、租户、可见群列表。
+- 点击后读取当前身份、内部 tenant_id、订单门店 / 门店身份 / 招募渠道关联门店，以及可见群列表。
 
 > 设计补充：当前原型保留已有消息/群聊能力入口，用于评审 IM 跳转，不改变通讯录的主业务边界。
 `
@@ -244,59 +282,65 @@
       selector: ".db-subtitle",
       title: "当前身份与跨租户隔离",
       md: `
-**显示样式：**通讯录顶部必须展示「当前租户」和「当前身份」，示例：当前租户：租户 A｜当前身份：南山店员。
+**显示样式：**通讯录顶部只展示「当前身份」和「范围」，不得展示租户名称、租户 ID、所属租户等对用户无意义的后台概念。
 
 **交互与排序：**
 - 通讯录页面只读取个人中心已切换身份，不在通讯录内重新设计复杂身份切换。
 - 用户在「我的」页切换身份后，再进入通讯录查看该身份下的数据。
 
 **业务定义：**
-- 当前身份 = 普通买家：默认不展示管理型门店群。
-- 当前身份 = 店员 / 店长：只展示当前门店群。
-- 当前身份 = 代理：展示该代理拓展 / 邀请 / 管理的门店群。
-- 管理型通讯录数据必须按照当前身份所属租户隔离，当前身份 tenant_id = A 时禁止展示租户 B 的门店群 / 代理门店群。
+- 当前身份 = 普通买家：根据成功订单所属门店展示订单门店群。订单归属哪个门店，就进入或复用哪个门店群。
+- 当前身份 = 店员：查询该用户作为店员所在的所有门店；同一身份 / 同一租户下可展示多个门店群。
+- 当前身份 = 店长：只展示自己负责的单一门店群，店长不跨门店、不跨租户。
+- 当前身份 = 代理：代理来源于「招募渠道」组织，展示该组织招募 / 关联门店群；代理永远是门店客户群最高层级和群主。
+- 数据必须按照当前身份内部 tenant_id 隔离，当前身份 tenant_id = A 时禁止展示 tenant_id = B 的门店群 / 代理门店群。
 - 好友、私聊、个人已加入群属于消息侧个人关系补充能力，不作为管理型门店群参与跨租户权限判断。
+- 前端页面不暴露租户字段；tenant_id 仅作为接口鉴权、查询隔离、日志排查字段。
 
 **异常流程：**
 - 当前身份失效：提示「当前身份不可用，请前往个人中心切换身份」。
 - 接口返回跨租户数据：前端不展示，后端记录异常日志，可提示「数据异常，请稍后重试」。
+- 买家订单归属门店无 IM user_id：生成客户关系并进入待邀请，不加入真实 IM 群。
 
 **接口字段：**
-- user_id、tenant_id、identity_type、store_id、agent_id、role_name、permission_scope。
+- user_id、tenant_id、identity_type、store_ids、managed_store_ids、agent_org_id、recruit_channel_org_id、order_store_ids、role_name、permission_scope。
 `
     },
     {
       id: 3,
       screens: ["home", "groups"],
       selector: ".db-section-title",
-      matchText: ["我的门店群", "我管理的门店群", "管理型群聊"],
+      matchText: ["订单门店群", "我的门店群", "我管理的门店群"],
       title: "通讯录列表与群卡片",
       md: `
 **显示样式：**通讯录列表由顶部导航、当前身份、搜索框、群聊分组、群聊列表和空状态组成。
 
 **群聊分组：**
-- 普通买家：显示「管理型群聊」空状态，不展示管理群。
-- 店员 / 店长：显示「我的门店群」。
-- 代理：显示「我管理的门店群」。
+- 普通买家：显示「订单门店群」。买家下单成功后，按订单所属门店展示可服务群；没有成功订单时才展示空状态。
+- 店员：显示「我的门店群」。店员可在同一身份 / 同一租户下属于多个门店，列表展示多个门店群。
+- 店长：显示「我的门店群」。店长只负责一个门店，列表只展示该门店群。
+- 代理：显示「我管理的门店群」。代理来源于招募渠道组织，展示该组织招募 / 关联门店群。
 
 **群卡片字段：**
 - 群名称：门店群聊名称。
-- 群类型：门店群 / 代理群 / 普通群聊。
 - 来源门店：群对应门店。
 - 群主：代理。代理永远是门店客户群的最高层级，只要门店存在代理归属，群主固定为代理。
 - 群管：店长、店员。
 - 客户数：白名单客户数量。
+- 待邀请：有效客户无 IM user_id 时，先生成客户关系，进入待邀请，不进入真实 IM 群。
 - 群状态：正常 / 异常 / 已自动创建。
 - 更新时间：最近成员变化时间。
+- 不展示字段：当前租户、所属租户、租户 ID、群类型。如设计稿没有群类型，不在 APP 侧显示。
 
 **搜索规则：**
-- 店员、店长只搜索当前门店群。
-- 代理只搜索代理名下门店群。
-- 普通买家不搜索管理群，仅搜索可见个人群聊或好友。
+- 买家搜索自己订单门店群、好友、可见聊天。
+- 店员搜索当前身份下所属门店群；同一身份下多个门店都可检索。
+- 店长只搜索自己负责的门店群。
+- 代理只搜索招募渠道组织关联门店群。
 - 支持字段：群名称、门店名称、群主名称、群管名称。
 
 **空状态：**
-- 普通买家：暂无可查看的通讯录，请切换为店员、店长或代理身份后查看相关群聊。
+- 普通买家：暂无相关门店群。下单成功后，可在这里查看对应门店服务群。
 - 店员 / 店长无群：当前门店暂无群聊，请联系管理员确认门店群是否已创建。
 - 代理无门店群：暂无可管理的门店群，当前代理身份下尚未绑定门店。
 `
@@ -308,25 +352,24 @@
       matchText: "群基础信息",
       title: "群详情基础信息",
       md: `
-**页面目标：**展示某个门店群的基础信息、群主、群管和白名单客户成员，帮助一线角色确认当前群是否符合身份和租户权限。
+**页面目标：**展示某个门店群的基础信息、群主、群管和白名单客户成员，帮助买家、店员、店长、代理确认当前群是否符合订单 / 门店 / 招募渠道关系。
 
 **基础字段：**
 - 群名称：门店群聊名称。
-- 群类型：门店群。
 - 来源门店：当前群所属门店。
 - 当前身份：当前用户查看身份。
-- 所属租户：当前身份所属租户。
-- 创建方式：系统自动创建。
+- 创建方式：门店创建自动生成，或买家下单成功后按订单所属门店自动创建 / 复用。
 - 创建时间：群生成时间。
 - 群状态：正常 / 异常 / 停用 / 待同步。
+- 不展示字段：当前租户、所属租户、tenant_id、租户名称、群类型。租户只作为后端隔离字段。
 
 **进入群聊按钮：**
-- 已有群聊能力：展示「进入群聊」或「发消息」。
-- 暂无聊天能力：隐藏按钮，只展示通讯录关系。
+- 已有真实 IM 能力：展示「进入群聊」或「发消息」。
+- 客户无 IM user_id：不直接进入真实 IM 群，进入待邀请。
 - 用户无群聊权限：按钮置灰或隐藏。
 
 **异常提示：**
-- 群主停用、群管离职、客户状态异常、群成员待同步、跨租户数据异常时显示提示。
+- 群主停用、群管离职、客户状态异常、客户待邀请、跨租户数据异常时显示提示。
 - V1.0 可以只提示，不在 APP 内做复杂处理。
 `
     },
@@ -342,6 +385,7 @@
 - 群管：店长、店员。
 - 客户人数：白名单客户数量。
 - 黑名单客户：不进入群，不在成员列表展示。
+- 待邀请客户：满足业务关系但没有 IM user_id 的客户，只生成客户关系，不进入真实 IM 群。
 - 异常成员：离职、停用、失效成员。
 
 **群主字段：**
@@ -357,7 +401,9 @@
 - 状态：正常 / 离职 / 停用。
 
 **客户展示规则：**
-- 客户属于当前门店，且客户状态 = 白名单，才展示在客户列表。
+- 买家有成功订单，且订单归属当前门店，才具备进入该门店群的业务关系。
+- 客户属于当前门店，且客户状态 = 白名单 / 有效客户，才展示在客户列表。
+- 进入真实 IM 群还必须具备 IM user_id 或满足 IM 自动入群授权。
 - 客户状态 = 黑名单 / 停用 / 删除 / 未确认，均不展示。
 - 如客户从白名单变为黑名单，后台同步后应从群成员中移除或隐藏。
 
@@ -367,6 +413,7 @@
 - 完整手机号查看权限由后台控制。
 
 [green] 白名单客户：可展示并进入群。
+[blue] 待邀请客户：有业务关系但缺少 IM user_id，暂不进入真实群。
 [red] 黑名单客户：不入群、不展示。
 `
     },
@@ -381,6 +428,7 @@
 **显示样式：**
 - 群聊页展示消息列表、输入框、语音按钮、加号工具区、发送按钮。
 - 工具区包含照片、文件、语音、相机、语音通话、视频通话。
+- 业务工具区补充商品、订单、红包、兑换券、新品推送，用于后续商品咨询、订单咨询、营销触达。
 
 **交互规则：**
 - 点击「进入群聊」或「发消息」进入会话页。
@@ -391,6 +439,7 @@
 **业务边界：**
 - 群聊权限仍由当前身份和群可见范围控制。
 - IM 是已有消息能力的承接入口，不改变通讯录的群关系展示职责。
+- 好友关系不作为入群强制前置条件；真实 IM 入群需要满足订单 / 门店 / 白名单 / 租户隔离规则，并具备 IM user_id。
 - 后端需根据 group_id、tenant_id、identity_type 校验会话访问权限。
 `
     },
@@ -437,14 +486,14 @@
 **身份来源：**当前身份由个人中心切换决定。通讯录只读取当前身份，不负责复杂身份管理。
 
 **本期支持身份：**
-- 普通买家：支持基础状态，默认不展示管理群。
-- 店员：展示当前门店群。
-- 店长：展示当前门店群，作为群管参与门店客户群。
-- 代理：展示其拓展 / 邀请 / 管理的门店群，代理永远是最高层级和群主。
+- 普通买家：根据成功订单所属门店展示订单门店群；没有成功订单时展示空状态。
+- 店员：展示当前身份下所在门店群；店员可跨门店、跨租户，但 APP 当前身份下必须隔离展示，不混合租户数据。
+- 店长：只负责一个门店，只展示该门店群，作为群管参与门店客户群。
+- 代理：来源于「招募渠道」组织，展示该组织招募 / 关联门店群，代理永远是最高层级和群主。
 
 **操作权限：**
 - 进入通讯录：普通买家、店员、店长、代理均可。
-- 查看门店群、群详情、群主、群管、客户列表：店员、店长、代理可。
+- 查看订单门店群、群详情、群主、群管、白名单客户列表：买家可查看自己订单关联门店群；店员、店长、代理按身份范围查看。
 - 查看完整手机号：按后台权限控制，默认脱敏。
 - 管理群成员：按后台权限控制，V1.0 前端不做复杂成员管理。
 
@@ -452,6 +501,7 @@
 - 主播通讯录、直播场次群。
 - 课程 / 录播群。
 - 独立移动端群管工作台。
+- 前端展示租户字段。
 - 后台配置页面。
 
 **后续规划：**
@@ -471,8 +521,8 @@
     const role = currentRole();
     return groups.filter(group => group.visible.includes(role.id) && (group.tenant === role.tenant || group.filter === "joined"));
   };
-  const visibleManagementGroups = () => visibleGroups().filter(group => group.filter === "store" || group.filter === "managed");
-  const visibleChatGroups = () => visibleGroups().filter(group => state.role !== "buyer" || group.filter === "joined");
+  const visibleManagementGroups = () => visibleGroups().filter(group => ["store", "managed", "order"].includes(group.filter));
+  const visibleChatGroups = () => visibleGroups().filter(group => state.role !== "buyer" || ["order", "joined"].includes(group.filter));
   const visibleCustomers = () => customers.filter(customer => customer.type !== "黑名单" && visibleManagementGroups().some(group => group.id === customer.groupId));
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
   const toneFor = value => value.includes("待") ? "amber" : value.includes("黑名单") || value.includes("不入群") ? "red" : value.includes("群管") || value.includes("加入") ? "blue" : value.includes("已") || value.includes("正常") || value.includes("白名单") ? "green" : "gray";
@@ -755,7 +805,7 @@
           <h1 class="db-title">通讯录</h1>
           <button class="db-icon-btn db-right" data-action="togglePlus"><span class="db-plus"></span></button>
         </div>
-        <div class="db-subtitle">当前租户：${escapeHtml(role.tenant)}｜当前身份：${escapeHtml(role.name)}</div>
+        <div class="db-subtitle">当前身份：${escapeHtml(role.name)}｜范围：${escapeHtml(role.scope)}</div>
         <button class="db-search db-search-as-button" data-action="openSearch">
           <span>⌕</span><span style="color:#b5bdc5;font-size:13px;">搜索群聊 / 门店 / 好友</span>
         </button>
@@ -823,8 +873,8 @@
           </section>
 
           <section class="db-section">
-            <div class="db-section-title">${state.role === "agent" ? "我管理的门店群" : state.role === "buyer" ? "管理型群聊" : "我的门店群"}</div>
-            ${managementGroups.length ? managementGroups.slice(0, 4).map(groupEntry).join("") : emptyState("暂无可查看的通讯录<br>请切换为店员、店长或代理身份后查看相关群聊", true)}
+            <div class="db-section-title">${state.role === "agent" ? "我管理的门店群" : state.role === "buyer" ? "订单门店群" : "我的门店群"}</div>
+            ${managementGroups.length ? managementGroups.slice(0, 4).map(groupEntry).join("") : emptyState(state.role === "buyer" ? "暂无相关门店群<br>下单成功后，可在这里查看对应门店服务群" : "暂无可查看的通讯录<br>请确认当前身份下是否有关联门店", true)}
           </section>
 
           ${chatGroups.some(group => group.filter === "joined") ? `
@@ -888,7 +938,7 @@
         ${avatar(group.name, group.filter === "joined" ? "blue" : group.filter === "managed" ? "violet" : "green", true)}
         <span class="db-entry-main">
           <p class="db-entry-title">${escapeHtml(group.name)}</p>
-          <p class="db-entry-sub">${escapeHtml(group.type)}｜${escapeHtml(group.source)}｜群主：${escapeHtml(group.owner)}</p>
+          <p class="db-entry-sub">来源：${escapeHtml(group.source)}｜群主：${escapeHtml(group.owner)}</p>
           <span class="db-entry-meta">
             ${group.customers ? badge(`白名单 ${group.customers}`, "green") : badge("内部协同", "violet")}
             ${group.excluded ? badge(`黑名单排除 ${group.excluded}`, "red") : ""}
@@ -900,7 +950,7 @@
   }
 
   function groupsScreen() {
-    const tabs = [["all", "全部"], ["store", "门店群"], ["managed", "我管理"], ["joined", "我加入"]];
+    const tabs = [["all", "全部"], ["order", "订单门店"], ["store", "门店群"], ["managed", "我管理"], ["joined", "我加入"]];
     const list = visibleChatGroups().filter(group => state.filter === "all" || group.filter === state.filter || (state.filter === "managed" && ["store", "managed"].includes(group.filter)));
     return `
       <div class="db-page db-soft">
@@ -928,7 +978,7 @@
         <button class="db-entry" data-action="openGroup" data-group="${group.id}" style="min-height:auto;">
           <span class="db-entry-main">
             <p class="db-entry-title">${escapeHtml(group.name)}</p>
-            <p class="db-entry-sub">${escapeHtml(group.type)}｜来源：${escapeHtml(group.source)}<br>群主：${escapeHtml(group.owner)}｜群管：${escapeHtml(group.managers)}</p>
+            <p class="db-entry-sub">来源：${escapeHtml(group.source)}<br>群主：${escapeHtml(group.owner)}｜群管：${escapeHtml(group.managers)}</p>
             <span class="db-entry-meta">
               ${group.customers ? badge(`白名单 ${group.customers}`, "green") : badge("无客户成员", "gray")}
               ${badge(`群管 ${group.managersList.length}`, "blue")}
@@ -1055,7 +1105,7 @@
               ${avatar(group.name, group.filter === "joined" ? "blue" : group.filter === "managed" ? "violet" : "green")}
               <div>
                 <h2 class="db-detail-name">${escapeHtml(group.name)}</h2>
-                <p class="db-detail-text">${escapeHtml(group.type)}｜${escapeHtml(group.source)}<br>群主：${escapeHtml(group.owner)}</p>
+                <p class="db-detail-text">来源：${escapeHtml(group.source)}<br>群主：${escapeHtml(group.owner)}</p>
               </div>
             </div>
             <div class="db-actions" style="padding:0 18px;">
@@ -1067,8 +1117,8 @@
             <div class="db-section-title">群基础信息</div>
             <div class="db-info-list">
               ${infoRow("当前身份", `${role.name}｜${role.scope}`)}
-              ${infoRow("所属租户", group.tenant)}
-              ${infoRow("创建方式", group.filter === "store" ? "系统自动创建" : "按当前身份可见")}
+              ${infoRow("来源门店", group.source)}
+              ${infoRow("创建方式", group.filter === "order" ? "下单成功后自动创建 / 复用" : group.filter === "store" ? "门店创建后自动创建" : "按当前身份可见")}
               ${infoRow("创建时间", group.created)}
               ${infoRow("群状态", group.status)}
             </div>
@@ -1358,12 +1408,13 @@
           <section class="db-section">
             <div class="db-section-title">规则说明</div>
             <div class="db-card">
-              <p class="db-entry-title" style="font-size:14px;">按身份和门店关系自动展示</p>
-              <p class="db-entry-sub">普通客户只看自己加入的群；店员、店长只看当前门店客户群；代理可看自己邀请门店下的客户群。白名单客户进入群聊，黑名单客户不展示。</p>
+              <p class="db-entry-title" style="font-size:14px;">按订单、门店和招募渠道自动展示</p>
+              <p class="db-entry-sub">门店创建或买家下单成功都会触发建群判断；同一门店群已存在则复用不重复创建。买家按成功订单归属门店入群；店员可看当前身份下多个门店群；店长只看负责门店；代理来自招募渠道组织且永远为群主。白名单客户进入群聊，黑名单客户不展示。</p>
               <div class="db-entry-meta">
                 ${badge("自动创建", "green")}
                 ${badge("黑名单排除", "red")}
                 ${badge("按身份可见", "blue")}
+                ${badge("订单入群", "green")}
               </div>
             </div>
           </section>
@@ -1423,6 +1474,11 @@
             ${toolButton("相机", "◉")}
             ${toolButton("语音通话", "☎")}
             ${toolButton("视频通话", "▣")}
+            ${toolButton("商品", "品")}
+            ${toolButton("订单", "单")}
+            ${toolButton("红包", "¥")}
+            ${toolButton("兑换券", "券")}
+            ${toolButton("新品", "新")}
           </div>
         </div>
         ${toast()}
@@ -1671,7 +1727,7 @@
     if (action === "openSync") { route("sync", { groupId: el.dataset.group || state.groupId }); return; }
     if (action === "openSettings") { route("settings", { groupId: el.dataset.group || state.groupId }); return; }
     if (action === "openFriendSettings") { route("friendSettings", { friendId: state.friendId }); return; }
-    if (action === "sourceToast") { showToast("群聊由身份、门店和白名单关系自动生成"); return; }
+    if (action === "sourceToast") { showToast("门店创建或买家下单成功触发建群；同门店群复用不重复创建"); return; }
     if (action === "roleSheet") { state.plus = false; state.sheet = "role"; render(); return; }
     if (action === "setRole") {
       state.role = el.dataset.role || state.role;
